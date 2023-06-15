@@ -17,7 +17,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:2.1.2")
     val ktorVersion = findProperty("ktorVersion")
     val exposedVersion = findProperty("exposedVersion")
-
+    // test
     implementation(project(":shared"))
 
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.20")
