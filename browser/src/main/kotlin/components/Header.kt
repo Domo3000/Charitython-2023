@@ -48,7 +48,7 @@ external interface HeaderProps : Props {
 
 val Header = FC<HeaderProps> { props ->
     val buttons = listOf(
-        Triple(SignUpState, Style.yellowColor, "Mach mit!"),
+        Triple(SignUpState, Style.yellowColor, "Cleanup anmelden"),
         Triple(ShareResultsState, Style.pinkColor, "Teile Ergebnisse!"),
         Triple(OrganizeState, Style.blueColor, "Organisiere Event!")
     )
