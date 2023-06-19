@@ -1,8 +1,11 @@
 package components
 
 import emotion.react.css
+import pages.AboutState
+import pages.DonateState
+import pages.FindEventState
 import pages.IndexState
-import pages.OrganizeState
+import pages.NewsletterState
 import pages.ShareResultsState
 import pages.SignUpState
 import react.FC
@@ -10,7 +13,12 @@ import react.Props
 import react.dom.events.MouseEventHandler
 import react.dom.html.ReactHTML
 import utils.Style
-import web.cssom.*
+import web.cssom.Auto
+import web.cssom.Color
+import web.cssom.Float
+import web.cssom.ObjectFit
+import web.cssom.TextDecoration
+import web.cssom.px
 import web.html.HTMLButtonElement
 
 external interface HeaderButtonProps : Props {
@@ -49,8 +57,11 @@ external interface HeaderProps : Props {
 val Header = FC<HeaderProps> { props ->
     val buttons = listOf(
         Triple(SignUpState, Style.yellowColor, "Cleanup anmelden"),
-        Triple(ShareResultsState, Style.pinkColor, "Teile Ergebnisse!"),
-        Triple(OrganizeState, Style.blueColor, "Organisiere Event!")
+        Triple(FindEventState, Style.pinkColor, "Cleanup finden"),
+        Triple(AboutState, Style.blueColor, "Über den WCD"),
+        Triple(ShareResultsState, Style.yellowColor, "Ergebnisse teilen"),
+        Triple(DonateState, Style.pinkColor, "Spenden"),
+        Triple(NewsletterState, Style.blueColor, "Newsletter"),
     )
     ReactHTML.div {
         ReactHTML.div {
