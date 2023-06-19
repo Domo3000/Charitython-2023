@@ -1,11 +1,9 @@
 package model
 
-import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -19,8 +17,8 @@ object CleanupEvent : IntIdTable() {
     val eventName = varchar("eventName", 100)
     val street = varchar("street", 100)
     val zipCode = varchar("zipCode", 10)
-    val startTime = datetime("startTime")
-    val endTime = datetime("endTime")
+    val startTime = varchar("startTime", 30)
+    val endTime = varchar("endTime", 30)
     val description = varchar("description", 500)
     val image = blob("image")
 }
@@ -38,8 +36,8 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
             eventName: String,
             street: String,
             zipCode: String,
-            startTime: LocalDateTime,
-            endTime: LocalDateTime,
+            startTime: String,
+            endTime: String,
             description: String,
             image: ExposedBlob
         ) = transaction {

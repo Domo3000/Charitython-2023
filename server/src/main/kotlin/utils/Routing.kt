@@ -14,9 +14,8 @@ import io.ktor.server.routing.*
 import kotlinx.css.CssBuilder
 import kotlinx.datetime.*
 import kotlinx.html.HTML
-import model.CleanupDay
-import model.CleanupDayDTO
-import model.CleanupDayDao
+import model.*
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 
 const val BASIC_AUTH = "auth-basic"
 
@@ -51,6 +50,10 @@ fun Application.installRouting() = routing {
             } ?: run {
                 call.respond(HttpStatusCode.NotFound, "current one might already be in past. next one is not set")
             }
+        }
+        post("/cleanupEvent") {
+            val dto = call.receive<CleanUpEventDTO>()
+            CleanupEventDao.insert(dto.cleanupDayId, dto.firstName, dto.lastName, dto.emailAddress, dto.organization, dto.websiteAddress, dto.eventName, dto.street, dto.zipCode, dto.startTime, dto.endTime, dto.description, ExposedBlob(dto.image))
         }
     }
 

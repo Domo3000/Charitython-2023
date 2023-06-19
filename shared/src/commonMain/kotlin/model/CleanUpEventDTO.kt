@@ -1,6 +1,5 @@
 package model
 
-import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,8 +13,8 @@ data class CleanUpEventDTO(
     val eventName: String,
     val street: String,
     val zipCode: String,
-    val startTime: LocalDateTime,
-    val endTime: LocalDateTime,
+    val startTime: String,
+    val endTime: String,
     val description: String,
     val image: ByteArray
 ) : Message()
