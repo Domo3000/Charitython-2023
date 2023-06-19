@@ -1,15 +1,19 @@
 package components
 
 import emotion.react.css
+import io.kvision.utils.perc
 import pages.IndexState
 import react.FC
 import react.Props
 import react.dom.html.ReactHTML
 import react.useState
 import web.cssom.Auto
+import web.cssom.BackgroundRepeat
+import web.cssom.BackgroundSize
 import web.cssom.Clear
 import web.cssom.px
 import web.cssom.url
+import web.cssom.vh
 import web.history.history
 
 external interface OverviewProps : Props {
@@ -40,23 +44,31 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
         setState(newState)
     }
 
-    Header {
-        currentState = state
-        stateSetter = { route, newState -> changeState(route, newState) }
-    }
-
     ReactHTML.div {
-        id = "content-holder"
         css {
-            margin = Auto.auto
-            maxWidth = 1000.px
-            minHeight = 600.px
-            paddingBottom = 200.px
-            clear = Clear.left
             backgroundImage = url("/static/landing-background-1.jpeg")
+            backgroundRepeat = BackgroundRepeat.noRepeat
+            backgroundSize = BackgroundSize.cover
+            height = 100.vh
         }
 
-        state.component { stateSetter = { route, newState -> changeState(route, newState) } }
+        Header {
+            currentState = state
+            stateSetter = { route, newState -> changeState(route, newState) }
+        }
+
+        ReactHTML.div {
+            id = "content-holder"
+            css {
+                margin = Auto.auto
+                maxWidth = 1000.px
+                minHeight = 600.px
+                paddingBottom = 200.px
+                clear = Clear.left
+            }
+
+            state.component { stateSetter = { route, newState -> changeState(route, newState) } }
+        }
     }
 
     Footer { stateSetter = { route, newState -> changeState(route, newState) } }
