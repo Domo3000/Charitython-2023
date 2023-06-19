@@ -1,16 +1,22 @@
 package components
 
 import emotion.react.css
-import io.kvision.utils.perc
 import pages.IndexState
 import react.FC
 import react.Props
 import react.dom.html.ReactHTML
 import react.useState
+import utils.Style
 import web.cssom.Auto
 import web.cssom.BackgroundRepeat
 import web.cssom.BackgroundSize
 import web.cssom.Clear
+import web.cssom.Color
+import web.cssom.Display
+import web.cssom.FlexDirection
+import web.cssom.JustifyContent
+import web.cssom.TextAlign
+import web.cssom.em
 import web.cssom.px
 import web.cssom.url
 import web.cssom.vh
@@ -68,6 +74,88 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
             }
 
             state.component { stateSetter = { route, newState -> changeState(route, newState) } }
+        }
+    }
+
+    ReactHTML.div {
+        css {
+            height = 100.vh
+            backgroundColor = Color(Style.backgroundColor)
+            display = Display.flex
+            flexDirection = FlexDirection.column
+        }
+
+        ReactHTML.h2 {
+            css {
+                textAlign = TextAlign.center
+                fontSize = 4.em
+            }
+
+            +"World Cleanup Day 2023"
+        }
+
+        ReactHTML.h3 {
+            css {
+                textAlign = TextAlign.center
+                fontSize = 3.em
+            }
+
+            +"Wir setzen weltweit ein Zeichen für den Umweltschutz!"
+        }
+
+        ReactHTML.div {
+            css {
+                display = Display.flex
+                flexDirection = FlexDirection.row
+                gap = 4.em
+                justifyContent = JustifyContent.center
+            }
+
+            ReactHTML.div {
+                css {
+                    backgroundColor = Color(Style.yellowColor)
+                }
+
+                ReactHTML.p {
+                    +"XY Tage"
+                }
+            }
+
+            ReactHTML.div {
+                css {
+                    backgroundColor = Color(Style.pinkColor)
+                }
+
+                ReactHTML.p {
+                    +"XY Stunden"
+                }
+            }
+
+            ReactHTML.div {
+                css {
+                    backgroundColor = Color(Style.blueColor)
+                }
+
+                ReactHTML.p {
+                    +"XY Minuten"
+                }
+            }
+        }
+
+        ReactHTML.div {
+            css {
+                textAlign = TextAlign.center
+            }
+
+            ReactHTML.p {
+                +"Am 16. September 2023 findet der World Cleanup Day statt. Weltweit werden an diesem Tag Straßen, Flüsse, Wälder "
+                +"und Strände von Müll befreit. Wir koordinieren dieses Event österreichweit."
+            }
+
+            ReactHTML.p {
+                +"Mit unserem Engagement wollen wir weltweit ein Zeichen im Sinne des Umweltschutzes setzen und gleichzeitig in der "
+                +"Bevölkerung das Bewusstsein für Abfallvermeidung steigern."
+            }
         }
     }
 
