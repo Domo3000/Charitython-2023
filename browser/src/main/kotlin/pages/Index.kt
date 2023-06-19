@@ -1,5 +1,6 @@
 package pages
 
+import components.HeaderButton
 import components.OverviewProps
 import components.OverviewState
 import emotion.react.css
@@ -27,45 +28,22 @@ object IndexState : OverviewState {
     override val component: FC<OverviewProps>
         get() = FC { props ->
             ReactHTML.div {
-                +"Overview"
+                ReactHTML.h1 {
+                    +"Am 16. September 2023 ist wieder World Cleanup Day!"
+                }
+                ReactHTML.h2 {
+                    +"In ganz Österreich wird aufgeräumt. Gemeinsam schaffen wir eine saubere Umwelt."
+                }
             }
 
             ReactHTML.div {
-                css {
-                    height = 800.px
+                HeaderButton {
+                    text = "Cleanup anmelden"
                 }
-                id = "map-holder"
-            }
 
-            useEffectOnce {
-                MapsModule.initialize()
-
-                hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
-                    val map = map(ktxDocument.getElementById("map-holder")!! as HTMLElement) {
-                        center = LatLng(47, 11) // TODO center a bit better
-                        zoom = 7
-                        preferCanvas = true
-                    }
-
-                    val layer = tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png") {
-                        attribution =
-                            "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
-                    }
-                    layer.addTo(map)
-
-                    // TODO load Events and forEach create marker
-                    val marker = marker(LatLng(48.210033, 16.363449)) {
-                        title = "Vienna"
-                        icon = icon {
-                            iconUrl = "/static/logo-oval.png"
-                            iconSize = Point(50, 50, true)
-                        }
-                    }
-
-                    marker.on("click", { props.stateSetter("/details/1", DetailsState("1")) })
-
-                    marker.addTo(map)
-                }.create())
+                HeaderButton {
+                    text = "Cleanup finden"
+                }
             }
         }
 }
