@@ -103,8 +103,7 @@ object AdminState : RouteState {
                         +"login"
                         onClick = {
                             val adminRequests = Requests.AdminRequests(usernameInput, passwordInput)
-                                setAdmin(adminRequests)
-
+                            setAdmin(adminRequests)
                         }
                     }
                 }

@@ -43,7 +43,7 @@ object Requests {
             client.use {
                 callback(it.get(url))
             }
-        }.start()
+        }
     }
 
     fun post(url: String, body: Message) {
@@ -65,7 +65,7 @@ object Requests {
                         basicAuth(username, password)
                     })
                 }
-            }.start()
+            }
         }
 
         fun post(url: String, body: Message) {
