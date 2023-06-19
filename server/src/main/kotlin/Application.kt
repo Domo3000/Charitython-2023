@@ -1,11 +1,15 @@
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import kotlinx.coroutines.coroutineScope
+import kotlinx.serialization.json.Json
+import model.AdminDao
 import org.slf4j.LoggerFactory
 import utils.*
 import java.io.File
@@ -69,9 +73,9 @@ private fun Application.body(debug: Boolean) {
             Connection(url, user, password)
         }
 
-        logInfo("password is" + (AdminDao.getNext()?.let { ": ${it.password}" } ?: " empty"))
+        logInfo("password is" + (AdminDao.getLatest()?.let { ": ${it.password}" } ?: " empty"))
 
-        val password = AdminDao.getNext()?.password ?: run {
+        val password = AdminDao.getLatest()?.password ?: run {
             val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
             val random = Random(System.currentTimeMillis())
             val newPass = (1..10).map {
@@ -96,6 +100,7 @@ private fun Application.body(debug: Boolean) {
                 }
             }
         }
+
         install(StatusPages) {
             exception<Throwable> { call, cause ->
                 logError(cause)
@@ -104,6 +109,13 @@ private fun Application.body(debug: Boolean) {
             status(HttpStatusCode.NotFound) { call, code ->
                 call.respondText(text = "Page Not Found", status = code)
             }
+        }
+
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                isLenient = true
+            })
         }
 
         installRouting()

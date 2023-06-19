@@ -11,8 +11,13 @@ kotlin {
     }
 
     sourceSets {
+        val serializationVersion = findProperty("serializationVersion")
+
         commonMain {
             dependencies {
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$serializationVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
             }
         }
         commonTest {

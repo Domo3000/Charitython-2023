@@ -13,8 +13,6 @@ application {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-auth-jvm:2.1.2")
-    implementation("io.ktor:ktor-server-core-jvm:2.1.2")
     val ktorVersion = findProperty("ktorVersion")
     val exposedVersion = findProperty("exposedVersion")
 
@@ -23,9 +21,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.20")
 
     implementation("io.ktor:ktor-server-auth:$ktorVersion")
+    implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-html-builder:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")

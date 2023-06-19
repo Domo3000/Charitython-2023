@@ -7,20 +7,13 @@ kotlin {
         binaries.executable()
         browser {
             webpackTask {
-                outputFileName = "main.js"
+                outputFileName = "admin.js"
             }
         }
     }
 }
 
 dependencies {
-    val ktorVersion = findProperty("ktorVersion")
-    val coroutineVersion = findProperty("coroutineVersion")
-    implementation("io.ktor:ktor-client-core:$ktorVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion")
-
     val suffix = "-pre.546"
     fun kotlinw(target: String, version: String): String = "org.jetbrains.kotlin-wrappers:kotlin-$target:$version$suffix"
     implementation(kotlinw("react", "18.2.0"))
