@@ -1,7 +1,6 @@
 package utils
 
 import io.ktor.client.*
-import io.ktor.client.engine.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
@@ -10,11 +9,9 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.core.*
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import model.Message
-import web.http.fetch
 
 object Requests {
     val client = HttpClient {
