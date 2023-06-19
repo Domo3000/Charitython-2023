@@ -60,8 +60,8 @@ val Header = FC<HeaderProps> { props ->
         Triple(FindEventState, Style.pinkColor, "Cleanup finden"),
         Triple(AboutState, Style.blueColor, "Über den WCD"),
         Triple(ShareResultsState, Style.yellowColor, "Ergebnisse teilen"),
-        Triple(DonateState, Style.pinkColor, "Spenden"),
-        Triple(NewsletterState, Style.blueColor, "Newsletter"),
+        // Triple(DonateState, Style.pinkColor, "Spenden"),
+        // Triple(NewsletterState, Style.blueColor, "Newsletter"),
     )
     ReactHTML.div {
         ReactHTML.div {
