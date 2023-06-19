@@ -29,7 +29,7 @@ external interface HeaderButtonProps : Props {
     var onClick: MouseEventHandler<HTMLButtonElement>
 }
 
-private val HeaderButton = FC<HeaderButtonProps> { props ->
+val HeaderButton = FC<HeaderButtonProps> { props ->
     ReactHTML.button {
         +props.text
         css {
