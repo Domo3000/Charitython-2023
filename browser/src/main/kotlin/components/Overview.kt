@@ -9,6 +9,7 @@ import react.useState
 import web.cssom.Auto
 import web.cssom.Clear
 import web.cssom.px
+import web.cssom.url
 import web.history.history
 
 external interface OverviewProps : Props {
@@ -52,6 +53,7 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
             minHeight = 600.px
             paddingBottom = 200.px
             clear = Clear.left
+            backgroundImage = url("/static/landing-background-1.jpeg")
         }
 
         state.component { stateSetter = { route, newState -> changeState(route, newState) } }
