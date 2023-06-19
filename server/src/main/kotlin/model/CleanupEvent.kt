@@ -1,9 +1,12 @@
 package model
 
+import kotlinx.datetime.LocalDateTime
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object CleanupEvent : IntIdTable() {
@@ -16,22 +19,30 @@ object CleanupEvent : IntIdTable() {
     val eventName = varchar("eventName", 100)
     val street = varchar("street", 100)
     val zipCode = varchar("zipCode", 10)
+    val startTime = datetime("startTime")
+    val endTime = datetime("endTime")
+    val description = varchar("description", 500)
     val image = blob("image")
 }
 
 
 class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<CleanupEventDao>(CleanupEvent) {
-        fun insert(cleanupDayId: Int,
-                   firstName:String,
-                   lastName:String,
-                   emailAddress:String,
-                   organization:String,
-                   websiteAddress:String,
-                   eventName:String,
-                   street:String,
-                   zipCode:String,
-                   image:ByteArray) = transaction {
+        fun insert(
+            cleanupDayId: Int,
+            firstName: String,
+            lastName: String,
+            emailAddress: String,
+            organization: String,
+            websiteAddress: String,
+            eventName: String,
+            street: String,
+            zipCode: String,
+            startTime: LocalDateTime,
+            endTime: LocalDateTime,
+            description: String,
+            image: ExposedBlob
+        ) = transaction {
             new {
                 this.cleanupDayId = cleanupDayId
                 this.firstName = firstName
@@ -42,6 +53,10 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
                 this.eventName = eventName
                 this.street = street
                 this.zipCode = zipCode
+                this.startTime = startTime
+                this.endTime = endTime
+                this.description = description
+                this.image = image
             }
         }
     }
@@ -55,5 +70,8 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
     var eventName by CleanupEvent.eventName
     var street by CleanupEvent.street
     var zipCode by CleanupEvent.zipCode
+    var startTime by CleanupEvent.startTime
+    var endTime by CleanupEvent.endTime
+    var description by CleanupEvent.description
     var image by CleanupEvent.image
 }
