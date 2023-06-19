@@ -14,7 +14,6 @@ import io.kvision.maps.LeafletObjectFactory.tileLayer
 import io.kvision.maps.LeafletObjectFactory.map
 import io.kvision.MapsModule
 import io.kvision.maps.LeafletObjectFactory
-import io.kvision.maps.Maps
 import io.kvision.maps.externals.leaflet.geo.LatLng
 import io.kvision.maps.externals.leaflet.geometry.Point
 import io.kvision.react.reactWrapper
@@ -27,7 +26,6 @@ import react.useEffectOnce
 import web.cssom.ClassName
 import web.cssom.pct
 
-import web.cssom.px
 import web.dom.document
 
 class CleanUpInformation(private val id: String?) : OverviewState {
@@ -55,13 +53,19 @@ class CleanUpInformation(private val id: String?) : OverviewState {
                     +"Fruhjahrsputz in Schwaan (Mecklenburg-Vorpommern)"
                 }
 
-                css(centered)
+                css(ClassName("grid-container")) {
+                    // TODO: setup grid styling
+                }
 
                 ReactHTML.div {
                     ReactHTML.h3 {
                         +"WANN"
                     }
                     id = "cleanup-detail-when"
+
+                    css(ClassName("cleanup-detail-when-column")) {
+                        //gridColumn = GridAutoColumns();
+                    }
 
                     ReactHTML.div {
                         ReactHTML.div {
@@ -115,7 +119,7 @@ class CleanUpInformation(private val id: String?) : OverviewState {
                     +"Map Container"
 
                     css {
-                        height = 500.px
+                        //height = 500.px
                     }
                     id = "cleanup-detail-map-location-holder"
                 }
