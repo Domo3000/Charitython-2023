@@ -27,8 +27,8 @@ private suspend inline fun ApplicationCall.respondCss(css: CSS) {
     this.respondText(CssBuilder().apply(css).toString(), ContentType.Text.CSS)
 }
 
-private suspend fun ApplicationCall.respondMessage(message: Message) {
-    this.respond(message.encode())
+private suspend fun ApplicationCall.respondMessage(message: Message?) {
+    message?.let { this.respond(it.encode()) } ?: this.respond("")
 }
 
 fun Application.installRouting() = routing {
@@ -39,8 +39,9 @@ fun Application.installRouting() = routing {
             }
             route("/data") {
                 post("/cleanupDay") {
-                    val new = call.receive<CleanupDayDTO>().timestamp.toLocalDateTime()
+                    val new = call.receive<CreateCleanupDay>().timestamp.toLocalDateTime()
                     CleanupDayDao.insert(new)
+                    call.respondMessage(CleanupDayDao.getNext()?.toDTO())
                 }
             }
         }

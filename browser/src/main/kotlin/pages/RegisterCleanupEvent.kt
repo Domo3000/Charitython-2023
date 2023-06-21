@@ -164,7 +164,7 @@ private val RegisterForm = FC<Props> {
                     description,
                     ByteArray(0)
                 )
-            )
+            ) {}
         }
     }
 }
@@ -202,7 +202,7 @@ object RegisterCleanupEvent : RouteState {
 
             useEffectOnce {
                 Requests.getMessage("/data/cleanupDay") {
-                    setCleanupDay(it as CleanupDayDTO)
+                    setCleanupDay(it as? CleanupDayDTO)
                     setLoaded(true)
                 }
             }

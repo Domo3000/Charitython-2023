@@ -1,22 +1,20 @@
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import kotlinx.coroutines.coroutineScope
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.Json
 import model.AdminDao
-import model.CleanupDayDao
 import org.slf4j.LoggerFactory
 import utils.*
 import java.io.File
 import java.security.KeyStore
 import kotlin.random.Random
-import kotlin.time.Duration.Companion.days
 
 suspend fun main(): Unit = coroutineScope {
     val keystoreFile = File("${System.getProperty("user.dir")}/documents/keystore.jks")
@@ -90,9 +88,6 @@ private fun Application.body(debug: Boolean) {
             newPass
         }
 
-        // TODO remove again -> just here for debugging
-        CleanupDayDao.getNext() ?: CleanupDayDao.insert(Clock.System.now().plus(1.days).toLocalDateTime(TimeZone.currentSystemDefault()))
-
         authentication {
             basic(BASIC_AUTH) {
                 realm = "/admin"
@@ -114,6 +109,14 @@ private fun Application.body(debug: Boolean) {
             status(HttpStatusCode.NotFound) { call, code ->
                 call.respondText(text = "Page Not Found", status = code)
             }
+        }
+
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                ignoreUnknownKeys = true
+                classDiscriminator = "class"
+            })
         }
 
         installRouting()

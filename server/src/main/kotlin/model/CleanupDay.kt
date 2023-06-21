@@ -11,6 +11,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.transactions.transaction
+import utils.toInstant
 
 object CleanupDay : IntIdTable() {
     val date = datetime("date")
@@ -29,4 +30,6 @@ class CleanupDayDao(id: EntityID<Int>) : IntEntity(id) {
     }
 
     var date by CleanupDay.date
+
+    fun toDTO(): CleanupDayDTO = CleanupDayDTO(id.value, date.toInstant())
 }

@@ -17,17 +17,22 @@ object Requests {
         install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true
-                isLenient = true
+                ignoreUnknownKeys = true
+                classDiscriminator = "class"
             })
         }
     }
 
-    fun getMessage(url: String, callback: (Message) -> Unit) {
+    fun getMessage(url: String, callback: (Message?) -> Unit) {
         MainScope().launch {
             val response = client.get(url)
+            var message: Message? = null
+
             if (response.status.isSuccess()) {
-                Messages.decode(response.bodyAsText())?.let(callback)
+                message = Messages.decode(response.bodyAsText())
             }
+
+            callback(message)
         }
     }
 
@@ -37,12 +42,12 @@ object Requests {
         }
     }
 
-    fun post(url: String, body: Message) {
+    fun post(url: String, body: Message, callback: (HttpResponse) -> Unit) {
         MainScope().launch {
-            client.post(url) {
+            callback(client.post(url) {
                 contentType(ContentType.Application.Json)
                 setBody(body)
-            }
+            })
         }
     }
 
@@ -55,13 +60,21 @@ object Requests {
             }
         }
 
-        fun post(url: String, body: Message) {
+        fun post(url: String, body: Message, callback: (Message?) -> Unit) {
             MainScope().launch {
-                client.post(url) {
+                var message: Message? = null
+
+                val response = client.post(url) {
                     basicAuth(username, password)
                     contentType(ContentType.Application.Json)
                     setBody(body)
                 }
+
+                if (response.status.isSuccess()) {
+                    message = Messages.decode(response.bodyAsText())
+                }
+
+                callback(message)
             }
         }
     }
