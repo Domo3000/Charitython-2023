@@ -8,6 +8,5 @@ pluginManagement {
 rootProject.name = "GreenHeroes"
 
 include(":shared")
-include(":admin")
 include(":browser")
 include(":server")

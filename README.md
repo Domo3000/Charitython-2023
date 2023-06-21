@@ -8,7 +8,11 @@ Probably nothing
 
 ## Project Structure
 
-Todo
+/shared: common code (eg DTOs) and assets
+
+/browser: React Frontend
+
+/server: Ktor Backend
 
 ### Backend
 
