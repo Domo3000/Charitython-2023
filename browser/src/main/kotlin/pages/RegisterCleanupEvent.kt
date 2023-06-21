@@ -27,8 +27,8 @@ private val RegisterForm = FC<Props> {
     val (startTime, setStartTime) = useState("")
     val (endTime, setEndTime) = useState("")
 
-    ReactHTML.div {
-        +"TODO"
+    ReactHTML.h1 {
+        +"TODO" // TODO finish this -> make it more beautiful and handle image upload
     }
 
     ReactHTML.form {
