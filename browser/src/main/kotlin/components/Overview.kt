@@ -7,20 +7,7 @@ import react.Props
 import react.dom.html.ReactHTML
 import react.useState
 import utils.Style
-import web.cssom.Auto
-import web.cssom.BackgroundAttachment
-import web.cssom.BackgroundRepeat
-import web.cssom.BackgroundSize
-import web.cssom.Clear
-import web.cssom.Color
-import web.cssom.Display
-import web.cssom.FlexDirection
-import web.cssom.JustifyContent
-import web.cssom.TextAlign
-import web.cssom.em
-import web.cssom.px
-import web.cssom.url
-import web.cssom.vh
+import web.cssom.*
 import web.history.history
 
 external interface OverviewProps : Props {
@@ -41,6 +28,11 @@ object NotFoundState : OverviewState {
             +"404 - Not Found"
         }
     }
+}
+
+private object CountdownStyleCommons {
+    val fontSize = 2.5.em
+    val padding = Padding(0.em, 1.em, 0.em, 1.em)
 }
 
 fun overview(component: OverviewState = IndexState) = FC<Props> {
@@ -83,8 +75,10 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
         css {
             height = 100.vh
             backgroundColor = Color(Style.backgroundColor)
+            color = Color(Style.whiteColor)
             display = Display.flex
             flexDirection = FlexDirection.column
+            justifyContent = JustifyContent.spaceEvenly
             margin = Auto.auto
         }
 
@@ -117,6 +111,8 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
             ReactHTML.div {
                 css {
                     backgroundColor = Color(Style.yellowColor)
+                    fontSize = CountdownStyleCommons.fontSize
+                    padding = CountdownStyleCommons.padding
                 }
 
                 ReactHTML.p {
@@ -127,6 +123,8 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
             ReactHTML.div {
                 css {
                     backgroundColor = Color(Style.pinkColor)
+                    fontSize = CountdownStyleCommons.fontSize
+                    padding = CountdownStyleCommons.padding
                 }
 
                 ReactHTML.p {
@@ -137,6 +135,8 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
             ReactHTML.div {
                 css {
                     backgroundColor = Color(Style.blueColor)
+                    fontSize = CountdownStyleCommons.fontSize
+                    padding = CountdownStyleCommons.padding
                 }
 
                 ReactHTML.p {
@@ -147,15 +147,26 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
 
         ReactHTML.div {
             css {
-                textAlign = TextAlign.center
+                marginLeft = Auto.auto
+                marginRight = Auto.auto
+                fontSize = 2.5.em
+                width = 80.vw
             }
 
             ReactHTML.p {
+                css {
+                    textAlign = TextAlign.center
+                }
+
                 +"Am 16. September 2023 findet der World Cleanup Day statt. Weltweit werden an diesem Tag Straßen, Flüsse, Wälder "
                 +"und Strände von Müll befreit. Wir koordinieren dieses Event österreichweit."
             }
 
             ReactHTML.p {
+                css {
+                    textAlign = TextAlign.center
+                }
+
                 +"Mit unserem Engagement wollen wir weltweit ein Zeichen im Sinne des Umweltschutzes setzen und gleichzeitig in der "
                 +"Bevölkerung das Bewusstsein für Abfallvermeidung steigern."
             }
