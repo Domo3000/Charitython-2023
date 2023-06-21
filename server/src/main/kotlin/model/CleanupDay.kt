@@ -15,11 +15,15 @@ import utils.toInstant
 
 object CleanupDay : IntIdTable() {
     val date = datetime("date")
+    val fileName = varchar("fileName", 50)
 }
 
 class CleanupDayDao(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<CleanupDayDao>(CleanupDay) {
-        fun insert(new: LocalDateTime) = transaction { new { date = new } }
+        fun insert(date: LocalDateTime, fileName: String) = transaction { new {
+            this.date = date
+            this.fileName = fileName
+        } }
         fun getNext() = transaction {
             find {
                 CleanupDay.date.greater(
@@ -30,6 +34,7 @@ class CleanupDayDao(id: EntityID<Int>) : IntEntity(id) {
     }
 
     var date by CleanupDay.date
+    var fileName by CleanupDay.fileName
 
-    fun toDTO(): CleanupDayDTO = CleanupDayDTO(id.value, date.toInstant())
+    fun toDTO(): CleanupDayDTO = CleanupDayDTO(id.value, date.toInstant(), fileName)
 }

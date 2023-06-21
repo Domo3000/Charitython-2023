@@ -14,7 +14,7 @@ sealed class Message {
 data class CreateCleanupDay(val timestamp: Instant) : Message()
 
 @Serializable
-data class CleanupDayDTO(val id: Int, val timestamp: Instant) : Message()
+data class CleanupDayDTO(val id: Int, val timestamp: Instant, val fileName: String) : Message()
 
 @Serializable
 data class CleanUpEventDTO(

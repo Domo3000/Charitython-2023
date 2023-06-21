@@ -1,11 +1,11 @@
 package components
 
 import emotion.react.css
+import model.CleanupDayDTO
 import pages.IndexPage
-import react.FC
-import react.Props
+import react.*
 import react.dom.html.ReactHTML
-import react.useState
+import utils.Requests
 import web.cssom.Auto
 import web.cssom.Clear
 import web.cssom.px
@@ -13,6 +13,8 @@ import web.history.history
 
 external interface OverviewProps : Props {
     var stateSetter: (String, OverviewPage) -> Unit
+    var cleanupDay: CleanupDayDTO?
+    var setCleanupDay: StateSetter<CleanupDayDTO?>
 }
 
 interface OverviewPage {
@@ -33,6 +35,7 @@ object NotFoundPage : OverviewPage {
 
 fun overview(component: OverviewPage = IndexPage) = FC<Props> {
     val (page, setPage) = useState(component)
+    val (cleanupDay, setCleanupDay) = useState<CleanupDayDTO?>(null)
 
     fun changeState(route: String, newState: OverviewPage) {
         history.replaceState(Unit, "", route)
@@ -40,6 +43,7 @@ fun overview(component: OverviewPage = IndexPage) = FC<Props> {
     }
 
     Header {
+        fileName = cleanupDay?.fileName?.let { "/files/$it" }
         currentPage = page
         pageSetter = { route, newState -> changeState(route, newState) }
     }
@@ -54,8 +58,18 @@ fun overview(component: OverviewPage = IndexPage) = FC<Props> {
             clear = Clear.left
         }
 
-        page.component { stateSetter = { route, newState -> changeState(route, newState) } }
+        page.component {
+            stateSetter = { route, newState -> changeState(route, newState) }
+            this.cleanupDay = cleanupDay
+            this.setCleanupDay = setCleanupDay
+        }
     }
 
     Footer { stateSetter = { route, newState -> changeState(route, newState) } }
+
+    useEffectOnce {
+        Requests.getMessage("/data/cleanupDay") {
+            setCleanupDay(it as? CleanupDayDTO)
+        }
+    }
 }

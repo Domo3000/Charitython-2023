@@ -12,7 +12,7 @@ import utils.Style
 import web.cssom.*
 import web.html.HTMLButtonElement
 
-private const val LOGO = "/static/WCD-logo.png"
+private const val DEFAULT_LOGO = "/static/WCD-logo-no-date.png"
 
 private typealias MenuButton = Triple<RoutePage, String, String>
 
@@ -47,6 +47,7 @@ private val HeaderButton = FC<HeaderButtonProps> { props ->
 }
 
 private external interface MenuProps : Props {
+    var fileName: String?
     var buttons: List<MenuButton>
     var currentPage: OverviewPage
     var pageSetter: (String, OverviewPage) -> Unit
@@ -66,7 +67,7 @@ private val PhoneHeader = FC<MenuProps> { props ->
                 objectFit = ObjectFit.contain
                 float = Float.left
             }
-            src = LOGO
+            src = props.fileName ?: DEFAULT_LOGO
             onClick = {
                 setMenuOpen(false)
                 props.pageSetter("/", IndexPage)
@@ -129,7 +130,7 @@ private val DesktopHeader = FC<MenuProps> { props ->
                 objectFit = ObjectFit.contain
                 float = Float.left
             }
-            src = LOGO
+            src = props.fileName ?: DEFAULT_LOGO
             onClick = {
                 props.pageSetter("/", IndexPage)
             }
@@ -148,16 +149,17 @@ private val DesktopHeader = FC<MenuProps> { props ->
     }
 }
 
-external interface HeaderProps : Props {
-    var currentPage: OverviewPage
-    var pageSetter: (String, OverviewPage) -> Unit
-}
-
 object ButtonColorPicker {
     val colors = listOf(Style.yellowColor, Style.pinkColor, Style.blueColor)
     var next = 0
 
     fun nextColor(): String = colors[next++ % colors.size]
+}
+
+external interface HeaderProps : Props {
+    var fileName: String?
+    var currentPage: OverviewPage
+    var pageSetter: (String, OverviewPage) -> Unit
 }
 
 val Header = FC<HeaderProps> { props ->
@@ -169,12 +171,14 @@ val Header = FC<HeaderProps> { props ->
 
     ReactHTML.div {
         PhoneHeader {
+            fileName = props.fileName
             this.buttons = buttons
             pageSetter = props.pageSetter
             currentPage = props.currentPage
         }
 
         DesktopHeader {
+            fileName = props.fileName
             this.buttons = buttons.reversed()
             pageSetter = props.pageSetter
             currentPage = props.currentPage

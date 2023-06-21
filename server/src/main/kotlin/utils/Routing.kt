@@ -4,6 +4,7 @@ import data.CSS
 import data.index
 import data.styles
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.html.*
@@ -12,9 +13,13 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.css.CssBuilder
+import kotlinx.datetime.LocalDateTime
 import kotlinx.html.HTML
 import model.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
+import java.io.File
+import java.io.IOException
+import java.util.*
 
 const val BASIC_AUTH = "auth-basic"
 
@@ -31,6 +36,25 @@ private suspend fun ApplicationCall.respondMessage(message: Message?) {
     message?.let { this.respond(it.encode()) } ?: this.respond("")
 }
 
+// TODO rename to saveImage, and use some library to check if its actually an image
+private fun PartData.FileItem.save(): String {
+    val baseDirectory = "${System.getProperty("user.dir")}/files"
+
+    val directory = File(baseDirectory)
+    if (!directory.isDirectory) {
+        directory.mkdir()
+    }
+
+    val fileBytes = streamProvider().readBytes()
+    val fileExtension = originalFileName?.takeLastWhile { it != '.' }
+    val fileName = UUID.randomUUID().toString() + "." + fileExtension
+
+    val imagePath = "$baseDirectory/$fileName"
+
+    File(imagePath).writeBytes(fileBytes)
+    return fileName
+}
+
 fun Application.installRouting() = routing {
     authenticate(BASIC_AUTH) {
         route("/admin") {
@@ -39,8 +63,30 @@ fun Application.installRouting() = routing {
             }
             route("/data") {
                 post("/cleanupDay") {
-                    val new = call.receive<CreateCleanupDay>().timestamp.toLocalDateTime()
-                    CleanupDayDao.insert(new)
+                    // TODO: for normal calls use something the following 3 lines
+                    //val new = call.receive<CreateCleanupDay>().timestamp.toLocalDateTime()
+                    //CleanupDayDao.insert(new)
+                    //call.respondMessage(CleanupDayDao.getNext()?.toDTO())
+
+                    var date: LocalDateTime? = null
+                    var fileName: String? = null
+
+                    call.receiveMultipart().forEachPart { partData ->
+                        when (partData) {
+                            is PartData.FormItem -> {
+                                date = (Messages.decode(partData.value) as CreateCleanupDay).timestamp.toLocalDateTime()
+                            }
+
+                            is PartData.FileItem -> {
+                                fileName = partData.save()
+                            }
+
+                            else -> {}
+                        }
+                    }
+
+                    CleanupDayDao.insert(date!!, fileName!!)
+
                     call.respondMessage(CleanupDayDao.getNext()?.toDTO())
                 }
             }
@@ -50,14 +96,28 @@ fun Application.installRouting() = routing {
     route("/data") {
         get("/cleanupDay") {
             CleanupDayDao.getNext()?.let {
-                call.respondMessage(CleanupDayDTO(it.id.value, it.date.toInstant()))
+                call.respondMessage(it.toDTO())
             } ?: run {
                 call.respond(HttpStatusCode.NotFound, "current one might already be in past. next one is not set")
             }
         }
         post("/cleanupEvent") {
             val dto = call.receive<CleanUpEventDTO>()
-            CleanupEventDao.insert(dto.cleanupDayId, dto.firstName, dto.lastName, dto.emailAddress, dto.organization, dto.websiteAddress, dto.eventName, dto.street, dto.zipCode, dto.startTime, dto.endTime, dto.description, ExposedBlob(dto.image))
+            CleanupEventDao.insert(
+                dto.cleanupDayId,
+                dto.firstName,
+                dto.lastName,
+                dto.emailAddress,
+                dto.organization,
+                dto.websiteAddress,
+                dto.eventName,
+                dto.street,
+                dto.zipCode,
+                dto.startTime,
+                dto.endTime,
+                dto.description,
+                ExposedBlob(dto.image)
+            )
         }
     }
 
@@ -72,6 +132,16 @@ fun Application.installRouting() = routing {
     }
     get("/static/styles.css") {
         call.respondCss(CssBuilder::styles)
+    }
+    get("/files/{fileName}") {
+        val fileName = call.parameters["fileName"]
+        val baseDirectory = "${System.getProperty("user.dir")}/files"
+
+        try {
+            call.respondFile(File("$baseDirectory/$fileName"))
+        } catch (e: IOException) {
+            call.respond(HttpStatusCode.NotFound)
+        }
     }
     get("/{...}") {
         call.respondHtml(HttpStatusCode.OK, HTML::index)

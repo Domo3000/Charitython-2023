@@ -1,28 +1,40 @@
 package pages
 
+import components.OverviewProps
 import components.RoutePage
 import emotion.react.css
 import io.ktor.http.*
+import js.buffer.ArrayBuffer
+import js.typedarrays.Int8Array
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toJSDate
 import model.CleanupDayDTO
 import model.CreateCleanupDay
-import react.*
+import react.FC
+import react.Props
+import react.StateSetter
 import react.dom.html.ReactHTML
+import react.useState
 import utils.Requests
 import utils.getMonthString
 import web.cssom.Clear
 import web.cssom.Float
+import web.file.FileReader
 import web.html.InputType
 import kotlin.js.Date
 
 private external interface AdminProps : Props {
     var admin: Requests.AdminRequests
+    var cleanupDay: CleanupDayDTO?
+    var setCleanupDay: StateSetter<CleanupDayDTO?>
 }
 
 private val CreateEventForm = FC<AdminProps> { props ->
-    val (cleanupDay, setCleanupDay) = useState<CleanupDayDTO?>(null)
-    val (dateInput, setDateInput) = useState<String>("")
+    val (dateInput, setDateInput) = useState("")
+    val (imageInput, setImageInput) = useState<ArrayBuffer?>(null)
+    val cleanupDay = props.cleanupDay
 
     ReactHTML.div {
         cleanupDay?.let { _ ->
@@ -37,9 +49,23 @@ private val CreateEventForm = FC<AdminProps> { props ->
             ReactHTML.form {
                 ReactHTML.input {
                     type = InputType.date
+                    required = true
                     onChange = {
                         setDateInput(it.target.value)
                         console.log(it.target.value)
+                    }
+                }
+                ReactHTML.input {
+                    type = InputType.file
+                    required = true
+                    onChange = {
+                        val fileReader = FileReader()
+
+                        fileReader.readAsArrayBuffer(it.target.files!![0])
+
+                        fileReader.onload = { e ->
+                            setImageInput(e.target!!.result as ArrayBuffer)
+                        }
                     }
                 }
                 ReactHTML.button {
@@ -47,36 +73,28 @@ private val CreateEventForm = FC<AdminProps> { props ->
                 }
                 onSubmit = {
                     it.preventDefault()
-                    val date = Date.parse(dateInput)
-                    props.admin.post(
-                        "/admin/data/cleanupDay",
-                        CreateCleanupDay(Instant.fromEpochMilliseconds(date.toLong()))
-                    ) { maybeMessage ->
-                        setCleanupDay(maybeMessage as? CleanupDayDTO)
+                    val date = Instant.fromEpochMilliseconds(Date.parse(dateInput).toLong())
+
+                    MainScope().launch {
+                        val image = imageInput!!.run { Int8Array(this) as ByteArray }
+
+                        props.admin.postImage(
+                            "/admin/data/cleanupDay",
+                            image,
+                            CreateCleanupDay(date)
+                        ) { maybeMessage ->
+                            props.setCleanupDay(maybeMessage as? CleanupDayDTO)
+                        }
                     }
                 }
             }
         }
     }
-
-    useEffectOnce {
-        Requests.getMessage("/data/cleanupDay") {
-            setCleanupDay(it as? CleanupDayDTO)
-        }
-    }
 }
 
 private val RegisterEventForm = FC<AdminProps> { props ->
-    val (cleanupDay, setCleanupDay) = useState<CleanupDayDTO?>(null)
-
     ReactHTML.div {
         +"TODO list all registrations, have a editable form with an accept button for them"
-    }
-
-    useEffectOnce {
-        Requests.getMessage("/data/cleanupDay") {
-            setCleanupDay(it as? CleanupDayDTO)
-        }
     }
 }
 
@@ -132,8 +150,8 @@ enum class AdminState(val text: String) {
 
 object AdminPage : RoutePage {
     override val route: String = "admin"
-    override val component: FC<Props>
-        get() = FC {
+    override val component: FC<OverviewProps>
+        get() = FC { props ->
             ReactHTML.div {
                 +"Admin"
 
@@ -162,6 +180,8 @@ object AdminPage : RoutePage {
                         when (state) {
                             AdminState.CreateEventState -> CreateEventForm {
                                 this.admin = admin
+                                cleanupDay = props.cleanupDay
+                                setCleanupDay = props.setCleanupDay
                             }
 
                             AdminState.RegisterEventState -> RegisterEventForm {
