@@ -8,6 +8,7 @@ import react.dom.html.ReactHTML
 import react.useState
 import utils.Style
 import web.cssom.Auto
+import web.cssom.BackgroundAttachment
 import web.cssom.BackgroundRepeat
 import web.cssom.BackgroundSize
 import web.cssom.Clear
@@ -55,6 +56,7 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
             backgroundImage = url("/static/landing-background-1.jpeg")
             backgroundRepeat = BackgroundRepeat.noRepeat
             backgroundSize = BackgroundSize.cover
+            backgroundAttachment = BackgroundAttachment.fixed
             height = 100.vh
         }
 
@@ -83,6 +85,7 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
             backgroundColor = Color(Style.backgroundColor)
             display = Display.flex
             flexDirection = FlexDirection.column
+            margin = Auto.auto
         }
 
         ReactHTML.h2 {
