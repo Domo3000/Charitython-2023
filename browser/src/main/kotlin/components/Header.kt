@@ -15,7 +15,11 @@ import utils.Style
 import web.cssom.*
 import web.html.HTMLButtonElement
 
-external interface HeaderButtonProps : Props {
+private const val LOGO = "/static/WCD-logo.png"
+
+private typealias MenuButton = Triple<RouteState, String, String>
+
+private external interface HeaderButtonProps : Props {
     var text: String
     var color: Color
     var disabled: Boolean
@@ -45,24 +49,105 @@ private val HeaderButton = FC<HeaderButtonProps> { props ->
     }
 }
 
-external interface HamburgerMenuProps : Props {
-    var onClick: MouseEventHandler<HTMLButtonElement>
+private external interface MenuProps : Props {
+    var buttons: List<MenuButton>
+    var currentState: OverviewState
+    var stateSetter: (String, OverviewState) -> Unit
 }
 
-private val HamburgerMenu = FC<HamburgerMenuProps> { props ->
-    ReactHTML.button {
-        +"☰"
+private val PhoneHeader = FC<MenuProps> { props ->
+    val (isMenuOpen, setMenuOpen) = useState(false)
+
+    ReactHTML.div {
         css(ClassNames.phoneElement) {
-            fontSize = 3.rem
-            background = None.none
-            border = None.none
-            marginTop = -1.rem
-            position = Position.absolute
-            top = 6.px
-            left = 0.px
-            zIndex = integer(3000)
+            height = 60.px
         }
-        onClick = props.onClick
+
+        ReactHTML.img {
+            css {
+                height = 100.pct
+                objectFit = ObjectFit.contain
+                float = Float.left
+            }
+            src = LOGO
+            onClick = {
+                setMenuOpen(false)
+                props.stateSetter("/", IndexState)
+            }
+        }
+        ReactHTML.button {
+            +"☰"
+            css {
+                fontSize = 3.rem
+                background = None.none
+                border = None.none
+                float = Float.right
+            }
+            onClick = { setMenuOpen(!isMenuOpen) }
+        }
+
+        ReactHTML.div {
+            css {
+                display = if (isMenuOpen) Display.block else None.none
+                position = Position.absolute
+                top = 60.px
+                left = 0.px
+                width = 100.pct
+                zIndex = integer(2000)
+                marginTop = 10.px
+                background = Color(Style.backgroundColor)
+            }
+            ReactHTML.div {
+                css {
+                    display = Display.flex
+                    flexDirection = FlexDirection.column
+                    flexWrap = FlexWrap.nowrap
+                }
+                props.buttons.forEach { (state, c, t) ->
+                    HeaderButton {
+                        text = t
+                        color = Color(c)
+                        disabled = props.currentState == state
+                        onClick = {
+                            setMenuOpen(false)
+                            props.stateSetter("/${state.route}", state)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private val DesktopHeader = FC<MenuProps> { props ->
+    ReactHTML.div {
+        css(ClassNames.desktopElement) {
+            margin = Auto.auto
+            maxWidth = 1000.px
+        }
+        id = "header"
+        ReactHTML.img {
+            css {
+                maxWidth = 200.px
+                objectFit = ObjectFit.contain
+                float = Float.left
+            }
+            src = LOGO
+            onClick = {
+                props.stateSetter("/", IndexState)
+            }
+        }
+        props.buttons.forEach { (state, c, t) ->
+            HeaderButton {
+                text = t
+                color = Color(c)
+                disabled = props.currentState == state
+                width = 110.0.px
+                onClick = {
+                    props.stateSetter("/${state.route}", state)
+                }
+            }
+        }
     }
 }
 
@@ -72,87 +157,23 @@ external interface HeaderProps : Props {
 }
 
 val Header = FC<HeaderProps> { props ->
-    val buttons = listOf(
+    val buttons: List<MenuButton> = listOf(
         Triple(SignUpState, Style.yellowColor, "Mach mit!"),
         Triple(ShareResultsState, Style.pinkColor, "Teile Ergebnisse!"),
         Triple(OrganizeState, Style.blueColor, "Organisiere Event!")
     )
 
-    val (isHamburgerOpen, setHamburgerOpen) = useState(false)
-
     ReactHTML.div {
-        HamburgerMenu {
-            onClick = {
-                setHamburgerOpen(!isHamburgerOpen)
-            }
+        PhoneHeader {
+            this.buttons = buttons
+            stateSetter = props.stateSetter
+            currentState = props.currentState
         }
-        // Because the hamburger menu is absolute, we need to fill the place below it with something so the title is
-        // not inside the button.
-        ReactHTML.div {
-            css {
-                height = 3.rem
-            }
-        }
-        ReactHTML.div {
-            css(ClassNames.desktopElement) {
-                margin = Auto.auto
-                maxWidth = 1000.px
-            }
-            id = "header"
-            ReactHTML.img {
-                css {
-                    maxWidth = 200.px
-                    objectFit = ObjectFit.contain
-                    float = Float.left
-                }
-                src = "/static/WCD-logo.png"
-                onClick = {
-                    props.stateSetter("/", IndexState)
-                }
-            }
-            buttons.forEach { (state, c, t) ->
-                HeaderButton {
-                    text = t
-                    color = Color(c)
-                    disabled = props.currentState == state
-                    width = 110.0.px
-                    onClick = {
-                        props.stateSetter("/${state.route}", state)
-                    }
-                }
-            }
-        }
-        ReactHTML.div {
-            css(ClassNames.phoneElement) {
-                display = if (isHamburgerOpen) Display.block else None.none
-                position = Position.absolute
-                top = 0.px
-                left = 0.px
-                zIndex = integer(2000)
-                width = 100.pct
-                height = 100.pct
-                paddingTop = 3.rem
-                boxSizing = BoxSizing.borderBox
-                backgroundColor = Color("#0000004f")
-            }
-            ReactHTML.div {
-                css {
-                    display = Display.flex
-                    flexDirection = FlexDirection.column
-                    flexWrap = FlexWrap.nowrap
-                }
-                buttons.forEach { (state, c, t) ->
-                    HeaderButton {
-                        text = t
-                        color = Color(c)
-                        disabled = props.currentState == state
-                        onClick = {
-                            setHamburgerOpen(false)
-                            props.stateSetter("/${state.route}", state)
-                        }
-                    }
-                }
-            }
+
+        DesktopHeader {
+            this.buttons = buttons
+            stateSetter = props.stateSetter
+            currentState = props.currentState
         }
     }
 }
