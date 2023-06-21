@@ -13,12 +13,7 @@ import react.Props
 import react.dom.events.MouseEventHandler
 import react.dom.html.ReactHTML
 import utils.Style
-import web.cssom.Auto
-import web.cssom.Color
-import web.cssom.Float
-import web.cssom.ObjectFit
-import web.cssom.TextDecoration
-import web.cssom.px
+import web.cssom.*
 import web.html.HTMLButtonElement
 
 external interface HeaderButtonProps : Props {
