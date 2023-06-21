@@ -1,6 +1,6 @@
 package pages
 
-import components.RouteState
+import components.RoutePage
 import kotlinx.datetime.toJSDate
 import model.CleanUpEventDTO
 import model.CleanupDayDTO
@@ -169,7 +169,7 @@ private val RegisterForm = FC<Props> {
     }
 }
 
-object RegisterCleanupEvent : RouteState {
+object RegisterCleanupEvent : RoutePage {
     override val route: String = "register-event"
     override val component: FC<Props>
         get() = FC {
@@ -185,7 +185,7 @@ object RegisterCleanupEvent : RouteState {
                     ReactHTML.div {
                         val date = cleanupDay.timestamp.toJSDate()
 
-                        +"Wir freuen uns sehr, dass du als Organisator:in beim World Cleanup Day am ${date.getDate()}. ${date.getMonthString()}. ${date.getFullYear()} dabei sein möchtest! Bitte füll das folgende Formular aus."
+                        +"Wir freuen uns sehr, dass du als Organisator:in beim World Cleanup Day am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} dabei sein möchtest! Bitte füll das folgende Formular aus."
                     }
 
                     RegisterForm { }

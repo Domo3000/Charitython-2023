@@ -33,7 +33,7 @@ private suspend fun ApplicationCall.respondMessage(message: Message?) {
 
 fun Application.installRouting() = routing {
     authenticate(BASIC_AUTH) {
-        route("/admin/") {
+        route("/admin") {
             get("/login") {
                 call.respond("Authenticated!")
             }

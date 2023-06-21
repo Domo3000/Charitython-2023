@@ -1,7 +1,7 @@
 package pages
 
 import components.OverviewProps
-import components.OverviewState
+import components.OverviewPage
 import emotion.react.css
 import io.kvision.MapsModule
 import io.kvision.maps.LeafletObjectFactory.icon
@@ -20,10 +20,9 @@ import react.dom.html.ReactHTML
 import react.useEffectOnce
 import web.cssom.px
 import web.dom.document
-import web.history.history
 import kotlinx.browser.document as ktxDocument
 
-object IndexState : OverviewState {
+object IndexPage : OverviewPage {
     override val component: FC<OverviewProps>
         get() = FC { props ->
             ReactHTML.div {
@@ -62,7 +61,7 @@ object IndexState : OverviewState {
                         }
                     }
 
-                    marker.on("click", { props.stateSetter("/details/1", DetailsState("1")) })
+                    marker.on("click", { props.stateSetter("/details/1", DetailsPage("1")) })
 
                     marker.addTo(map)
                 }.create())

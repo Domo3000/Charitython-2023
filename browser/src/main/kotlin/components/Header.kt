@@ -14,7 +14,7 @@ import web.html.HTMLButtonElement
 
 private const val LOGO = "/static/WCD-logo.png"
 
-private typealias MenuButton = Triple<RouteState, String, String>
+private typealias MenuButton = Triple<RoutePage, String, String>
 
 private external interface HeaderButtonProps : Props {
     var text: String
@@ -48,8 +48,8 @@ private val HeaderButton = FC<HeaderButtonProps> { props ->
 
 private external interface MenuProps : Props {
     var buttons: List<MenuButton>
-    var currentState: OverviewState
-    var stateSetter: (String, OverviewState) -> Unit
+    var currentPage: OverviewPage
+    var pageSetter: (String, OverviewPage) -> Unit
 }
 
 private val PhoneHeader = FC<MenuProps> { props ->
@@ -69,7 +69,7 @@ private val PhoneHeader = FC<MenuProps> { props ->
             src = LOGO
             onClick = {
                 setMenuOpen(false)
-                props.stateSetter("/", IndexState)
+                props.pageSetter("/", IndexPage)
             }
         }
         ReactHTML.button {
@@ -104,10 +104,10 @@ private val PhoneHeader = FC<MenuProps> { props ->
                     HeaderButton {
                         text = t
                         color = Color(c)
-                        disabled = props.currentState == state
+                        disabled = props.currentPage == state
                         onClick = {
                             setMenuOpen(false)
-                            props.stateSetter("/${state.route}", state)
+                            props.pageSetter("/${state.route}", state)
                         }
                     }
                 }
@@ -131,17 +131,17 @@ private val DesktopHeader = FC<MenuProps> { props ->
             }
             src = LOGO
             onClick = {
-                props.stateSetter("/", IndexState)
+                props.pageSetter("/", IndexPage)
             }
         }
         props.buttons.forEach { (state, c, t) ->
             HeaderButton {
                 text = t
                 color = Color(c)
-                disabled = props.currentState == state
+                disabled = props.currentPage == state
                 width = 110.0.px
                 onClick = {
-                    props.stateSetter("/${state.route}", state)
+                    props.pageSetter("/${state.route}", state)
                 }
             }
         }
@@ -149,8 +149,8 @@ private val DesktopHeader = FC<MenuProps> { props ->
 }
 
 external interface HeaderProps : Props {
-    var currentState: OverviewState
-    var stateSetter: (String, OverviewState) -> Unit
+    var currentPage: OverviewPage
+    var pageSetter: (String, OverviewPage) -> Unit
 }
 
 object ButtonColorPicker {
@@ -163,21 +163,21 @@ object ButtonColorPicker {
 val Header = FC<HeaderProps> { props ->
     val buttons: List<MenuButton> = listOf(
         RegisterCleanupEvent to "Cleanup anmelden",
-        SignUpState to "Cleanup finden",
-        ShareResultsState to "Ergebnisse teilen"
+        SignUpPage to "Cleanup finden",
+        ShareResultsPage to "Ergebnisse teilen"
     ).map { (page, text) -> Triple(page, ButtonColorPicker.nextColor(), text) }
 
     ReactHTML.div {
         PhoneHeader {
             this.buttons = buttons
-            stateSetter = props.stateSetter
-            currentState = props.currentState
+            pageSetter = props.pageSetter
+            currentPage = props.currentPage
         }
 
         DesktopHeader {
             this.buttons = buttons.reversed()
-            stateSetter = props.stateSetter
-            currentState = props.currentState
+            pageSetter = props.pageSetter
+            currentPage = props.currentPage
         }
     }
 }

@@ -1,7 +1,7 @@
 package components
 
 import emotion.react.css
-import pages.IndexState
+import pages.IndexPage
 import react.FC
 import react.Props
 import react.dom.html.ReactHTML
@@ -12,18 +12,18 @@ import web.cssom.px
 import web.history.history
 
 external interface OverviewProps : Props {
-    var stateSetter: (String, OverviewState) -> Unit
+    var stateSetter: (String, OverviewPage) -> Unit
 }
 
-interface OverviewState {
+interface OverviewPage {
     val component: FC<OverviewProps>
 }
 
-interface RouteState : OverviewState {
+interface RoutePage : OverviewPage {
     val route: String
 }
 
-object NotFoundState : OverviewState {
+object NotFoundPage : OverviewPage {
     override val component = FC<Props> {
         ReactHTML.div {
             +"404 - Not Found"
@@ -31,17 +31,17 @@ object NotFoundState : OverviewState {
     }
 }
 
-fun overview(component: OverviewState = IndexState) = FC<Props> {
-    val (state, setState) = useState(component)
+fun overview(component: OverviewPage = IndexPage) = FC<Props> {
+    val (page, setPage) = useState(component)
 
-    fun changeState(route: String, newState: OverviewState) {
+    fun changeState(route: String, newState: OverviewPage) {
         history.replaceState(Unit, "", route)
-        setState(newState)
+        setPage(newState)
     }
 
     Header {
-        currentState = state
-        stateSetter = { route, newState -> changeState(route, newState) }
+        currentPage = page
+        pageSetter = { route, newState -> changeState(route, newState) }
     }
 
     ReactHTML.div {
@@ -54,7 +54,7 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
             clear = Clear.left
         }
 
-        state.component { stateSetter = { route, newState -> changeState(route, newState) } }
+        page.component { stateSetter = { route, newState -> changeState(route, newState) } }
     }
 
     Footer { stateSetter = { route, newState -> changeState(route, newState) } }
