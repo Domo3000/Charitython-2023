@@ -12,11 +12,9 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.css.CssBuilder
-import kotlinx.datetime.*
 import kotlinx.html.HTML
-import model.CleanupDay
-import model.CleanupDayDTO
-import model.CleanupDayDao
+import model.*
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 
 const val BASIC_AUTH = "auth-basic"
 
@@ -29,6 +27,10 @@ private suspend inline fun ApplicationCall.respondCss(css: CSS) {
     this.respondText(CssBuilder().apply(css).toString(), ContentType.Text.CSS)
 }
 
+private suspend fun ApplicationCall.respondMessage(message: Message) {
+    this.respond(message.encode())
+}
+
 fun Application.installRouting() = routing {
     authenticate(BASIC_AUTH) {
         route("/admin/") {
@@ -37,7 +39,7 @@ fun Application.installRouting() = routing {
             }
             route("/data") {
                 post("/cleanupDay") {
-                    val new = call.receive<CleanupDayDTO>().timestamp.toLocalDateTime(TimeZone.currentSystemDefault())
+                    val new = call.receive<CleanupDayDTO>().timestamp.toLocalDateTime()
                     CleanupDayDao.insert(new)
                 }
             }
@@ -47,10 +49,14 @@ fun Application.installRouting() = routing {
     route("/data") {
         get("/cleanupDay") {
             CleanupDayDao.getNext()?.let {
-                call.respond(it)
+                call.respondMessage(CleanupDayDTO(it.id.value, it.date.toInstant()))
             } ?: run {
                 call.respond(HttpStatusCode.NotFound, "current one might already be in past. next one is not set")
             }
+        }
+        post("/cleanupEvent") {
+            val dto = call.receive<CleanUpEventDTO>()
+            CleanupEventDao.insert(dto.cleanupDayId, dto.firstName, dto.lastName, dto.emailAddress, dto.organization, dto.websiteAddress, dto.eventName, dto.street, dto.zipCode, dto.startTime, dto.endTime, dto.description, ExposedBlob(dto.image))
         }
     }
 

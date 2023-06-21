@@ -2,10 +2,7 @@ package components
 
 import css.ClassNames
 import emotion.react.css
-import pages.IndexState
-import pages.OrganizeState
-import pages.ShareResultsState
-import pages.SignUpState
+import pages.*
 import react.FC
 import react.Props
 import react.dom.events.MouseEventHandler
@@ -156,12 +153,19 @@ external interface HeaderProps : Props {
     var stateSetter: (String, OverviewState) -> Unit
 }
 
+object ButtonColorPicker {
+    val colors = listOf(Style.yellowColor, Style.pinkColor, Style.blueColor)
+    var next = 0
+
+    fun nextColor(): String = colors[next++ % colors.size]
+}
+
 val Header = FC<HeaderProps> { props ->
     val buttons: List<MenuButton> = listOf(
-        Triple(SignUpState, Style.yellowColor, "Mach mit!"),
-        Triple(ShareResultsState, Style.pinkColor, "Teile Ergebnisse!"),
-        Triple(OrganizeState, Style.blueColor, "Organisiere Event!")
-    )
+        RegisterCleanupEvent to "Cleanup anmelden",
+        SignUpState to "Cleanup finden",
+        ShareResultsState to "Ergebnisse teilen"
+    ).map { (page, text) -> Triple(page, ButtonColorPicker.nextColor(), text) }
 
     ReactHTML.div {
         PhoneHeader {
@@ -171,7 +175,7 @@ val Header = FC<HeaderProps> { props ->
         }
 
         DesktopHeader {
-            this.buttons = buttons
+            this.buttons = buttons.reversed()
             stateSetter = props.stateSetter
             currentState = props.currentState
         }

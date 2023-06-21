@@ -38,7 +38,7 @@ val Routing = FC<Props> {
     val routeStates = listOf(
         AdminState,
         ImpressumState,
-        OrganizeState,
+        RegisterCleanupEvent,
         ShareResultsState,
         SignUpState
     )
