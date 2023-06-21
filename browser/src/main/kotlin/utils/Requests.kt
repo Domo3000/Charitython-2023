@@ -1,17 +1,16 @@
 package utils
 
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.utils.io.core.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import model.Message
+import model.Messages
 
 object Requests {
     val client = HttpClient {
@@ -23,33 +22,26 @@ object Requests {
         }
     }
 
-    fun getMessage(url: String): Message? {
-        var message: Message? = null
-
+    fun getMessage(url: String, callback: (Message) -> Unit) {
         MainScope().launch {
-            client.use {
-                message = it.get(url).body() as Message
+            val response = client.get(url)
+            if (response.status.isSuccess()) {
+                Messages.decode(response.bodyAsText())?.let(callback)
             }
         }
-
-        return message
     }
 
     fun get(url: String, callback: (HttpResponse) -> Unit) {
         MainScope().launch {
-            client.use {
-                callback(it.get(url))
-            }
+            callback(client.get(url))
         }
     }
 
     fun post(url: String, body: Message) {
         MainScope().launch {
-            client.use {
-                it.post(url) {
-                    contentType(ContentType.Application.Json)
-                    setBody(body)
-                }
+            client.post(url) {
+                contentType(ContentType.Application.Json)
+                setBody(body)
             }
         }
     }
@@ -57,22 +49,18 @@ object Requests {
     class AdminRequests(private val username: String, private val password: String) {
         fun get(url: String, callback: (HttpResponse) -> Unit) {
             MainScope().launch {
-                client.use {
-                    callback(it.get(url) {
-                        basicAuth(username, password)
-                    })
-                }
+                callback(client.get(url) {
+                    basicAuth(username, password)
+                })
             }
         }
 
         fun post(url: String, body: Message) {
             MainScope().launch {
-                client.use {
-                    it.post(url) {
-                        basicAuth(username, password)
-                        contentType(ContentType.Application.Json)
-                        setBody(body)
-                    }
+                client.post(url) {
+                    basicAuth(username, password)
+                    contentType(ContentType.Application.Json)
+                    setBody(body)
                 }
             }
         }
