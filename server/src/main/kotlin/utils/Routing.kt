@@ -19,7 +19,6 @@ import model.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import java.io.File
 import java.io.IOException
-import java.util.*
 
 const val BASIC_AUTH = "auth-basic"
 
@@ -36,25 +35,6 @@ private suspend fun ApplicationCall.respondMessage(message: Message?) {
     message?.let { this.respond(it.encode()) } ?: this.respond("")
 }
 
-// TODO rename to saveImage, and use some library to check if its actually an image
-private fun PartData.FileItem.save(): String {
-    val baseDirectory = "${System.getProperty("user.dir")}/files"
-
-    val directory = File(baseDirectory)
-    if (!directory.isDirectory) {
-        directory.mkdir()
-    }
-
-    val fileBytes = streamProvider().readBytes()
-    val fileExtension = originalFileName?.takeLastWhile { it != '.' }
-    val fileName = UUID.randomUUID().toString() + "." + fileExtension
-
-    val imagePath = "$baseDirectory/$fileName"
-
-    File(imagePath).writeBytes(fileBytes)
-    return fileName
-}
-
 fun Application.installRouting() = routing {
     authenticate(BASIC_AUTH) {
         route("/admin") {
@@ -63,7 +43,7 @@ fun Application.installRouting() = routing {
             }
             route("/data") {
                 post("/cleanupDay") {
-                    // TODO: for normal calls use something the following 3 lines
+                    // TODO: for normal requests use something like the following 3 lines
                     //val new = call.receive<CreateCleanupDay>().timestamp.toLocalDateTime()
                     //CleanupDayDao.insert(new)
                     //call.respondMessage(CleanupDayDao.getNext()?.toDTO())
@@ -78,16 +58,20 @@ fun Application.installRouting() = routing {
                             }
 
                             is PartData.FileItem -> {
-                                fileName = partData.save()
+                                fileName = partData.saveImage()
                             }
 
                             else -> {}
                         }
                     }
 
-                    CleanupDayDao.insert(date!!, fileName!!)
+                    if(fileName == null) {
+                        call.respond(HttpStatusCode.BadRequest, "file was not a supported image")
+                    } else {
+                        CleanupDayDao.insert(date!!, fileName!!)
 
-                    call.respondMessage(CleanupDayDao.getNext()?.toDTO())
+                        call.respondMessage(CleanupDayDao.getNext()?.toDTO())
+                    }
                 }
             }
         }

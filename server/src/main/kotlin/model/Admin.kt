@@ -4,6 +4,7 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.max
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -13,7 +14,6 @@ object Admin : IntIdTable() {
     val password = varchar("password", 10)
 }
 
-// TODO serializable?
 class AdminDao(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<AdminDao>(Admin) {
         fun insert(new: String) = transaction { new { password = new } }
@@ -23,6 +23,9 @@ class AdminDao(id: EntityID<Int>) : IntEntity(id) {
             find {
                 Admin.id.eq(wrapAsExpression(max))
             }.firstOrNull()
+        }
+        fun deleteAll() = transaction {
+            Admin.deleteAll()
         }
     }
 

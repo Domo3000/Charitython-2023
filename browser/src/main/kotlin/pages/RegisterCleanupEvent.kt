@@ -1,5 +1,6 @@
 package pages
 
+import components.OverviewProps
 import components.RoutePage
 import kotlinx.datetime.toJSDate
 import model.CleanUpEventDTO
@@ -134,6 +135,7 @@ private val RegisterForm = FC<Props> {
             }
         }
 
+        // TODO for file input see Admin Page in /browser and post("/cleanupDay") route in /server
         ReactHTML.div {
             +"file: "
             ReactHTML.input {
@@ -171,39 +173,27 @@ private val RegisterForm = FC<Props> {
 
 object RegisterCleanupEvent : RoutePage {
     override val route: String = "register-event"
-    override val component: FC<Props>
-        get() = FC {
-            val (loaded, setLoaded) = useState(false)
-            val (cleanupDay, setCleanupDay) = useState<CleanupDayDTO?>(null)
-
+    override val component: FC<OverviewProps>
+        get() = FC { props ->
             ReactHTML.h3 {
                 +"Cleanup anmelden"
             }
 
-            if (loaded) {
-                cleanupDay?.let { _ ->
-                    ReactHTML.div {
-                        val date = cleanupDay.timestamp.toJSDate()
+            props.cleanupDay?.let { cleanupDay ->
+                ReactHTML.div {
+                    val date = cleanupDay.timestamp.toJSDate()
 
-                        +"Wir freuen uns sehr, dass du als Organisator:in beim World Cleanup Day am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} dabei sein möchtest! Bitte füll das folgende Formular aus."
-                    }
-
-                    RegisterForm { }
-                } ?: run {
-                    ReactHTML.div {
-                        +"Wir freuen uns sehr, dass du als Organisator:in beim nächsten World Cleanup Day dabei sein möchtest!"
-                    }
-                    ReactHTML.br {}
-                    ReactHTML.div {
-                        +"Leider ist dieser noch nicht festgelegt worden!"
-                    }
+                    +"Wir freuen uns sehr, dass du als Organisator:in beim World Cleanup Day am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} dabei sein möchtest! Bitte füll das folgende Formular aus."
                 }
-            }
 
-            useEffectOnce {
-                Requests.getMessage("/data/cleanupDay") {
-                    setCleanupDay(it as? CleanupDayDTO)
-                    setLoaded(true)
+                RegisterForm { }
+            } ?: run {
+                ReactHTML.div {
+                    +"Wir freuen uns sehr, dass du als Organisator:in beim nächsten World Cleanup Day dabei sein möchtest!"
+                }
+                ReactHTML.br {}
+                ReactHTML.div {
+                    +"Leider ist dieser noch nicht festgelegt worden!"
                 }
             }
         }
