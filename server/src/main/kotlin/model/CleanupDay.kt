@@ -9,6 +9,8 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.transactions.transaction
 import utils.toInstant
@@ -30,6 +32,9 @@ class CleanupDayDao(id: EntityID<Int>) : IntEntity(id) {
                     Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
                 )
             }.orderBy(CleanupDay.date to SortOrder.ASC).firstOrNull()
+        }
+        fun deleteById(id: Int) = transaction {
+            CleanupDay.deleteWhere { CleanupDay.id eq id }
         }
     }
 

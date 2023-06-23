@@ -73,6 +73,16 @@ fun Application.installRouting() = routing {
                         call.respondMessage(CleanupDayDao.getNext()?.toDTO())
                     }
                 }
+
+                delete("/cleanupDay/{id}") {
+                    val id = Integer.parseInt(call.parameters["id"])
+
+                    if(CleanupDayDao.deleteById(id) == 1) {
+                        call.respondMessage(DeletedCleanupDay)
+                    } else {
+                        call.respond(HttpStatusCode.NotFound)
+                    }
+                }
             }
         }
     }

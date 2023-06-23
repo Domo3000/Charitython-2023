@@ -54,11 +54,30 @@ object Requests {
     }
 
     class AdminRequests(private val username: String, private val password: String) {
+        private val prefix = "/admin"
+
         fun get(url: String, callback: (HttpResponse) -> Unit) {
             MainScope().launch {
-                callback(client.get(url) {
+                callback(client.get(prefix + url) {
                     basicAuth(username, password)
                 })
+            }
+        }
+
+        fun delete(url: String, callback: (Message?) -> Unit) {
+            MainScope().launch {
+                var message: Message? = null
+
+                val response = client.delete(prefix + url) {
+                    basicAuth(username, password)
+                    contentType(ContentType.Application.Json)
+                }
+
+                if (response.status.isSuccess()) {
+                    message = Messages.decode(response.bodyAsText())
+                }
+
+                callback(message)
             }
         }
 
@@ -66,7 +85,7 @@ object Requests {
             MainScope().launch {
                 var message: Message? = null
 
-                val response = client.post(url) {
+                val response = client.post(prefix + url) {
                     basicAuth(username, password)
                     contentType(ContentType.Application.Json)
                     setBody(body)
@@ -84,7 +103,7 @@ object Requests {
             MainScope().launch {
                 var message: Message? = null
 
-                val response = client.submitFormWithBinaryData(url,
+                val response = client.submitFormWithBinaryData(prefix + url,
                     formData {
                         append("image", image, Headers.build {
                             append(HttpHeaders.ContentType, ContentType.Image.PNG)

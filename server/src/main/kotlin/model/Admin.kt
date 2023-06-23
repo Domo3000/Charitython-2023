@@ -4,7 +4,6 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.max
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -23,9 +22,6 @@ class AdminDao(id: EntityID<Int>) : IntEntity(id) {
             find {
                 Admin.id.eq(wrapAsExpression(max))
             }.firstOrNull()
-        }
-        fun deleteAll() = transaction {
-            Admin.deleteAll()
         }
     }
 

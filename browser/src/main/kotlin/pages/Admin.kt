@@ -6,12 +6,16 @@ import emotion.react.css
 import io.ktor.http.*
 import js.buffer.ArrayBuffer
 import js.typedarrays.Int8Array
+import kotlinx.browser.window
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toJSDate
 import model.CleanupDayDTO
 import model.CreateCleanupDay
+import model.DeletedCleanupDay
+import org.w3c.dom.get
+import org.w3c.dom.set
 import react.FC
 import react.Props
 import react.StateSetter
@@ -25,6 +29,8 @@ import web.file.FileReader
 import web.html.InputType
 import kotlin.js.Date
 
+private const val AdminPassword = "adminPassword"
+
 private external interface AdminProps : Props {
     var admin: Requests.AdminRequests
     var cleanupDay: CleanupDayDTO?
@@ -34,52 +40,92 @@ private external interface AdminProps : Props {
 private val CreateEventForm = FC<AdminProps> { props ->
     val (dateInput, setDateInput) = useState("")
     val (imageInput, setImageInput) = useState<ArrayBuffer?>(null)
+    val (warningDialog, setWarningDialog) = useState(false)
     val cleanupDay = props.cleanupDay
 
     ReactHTML.div {
         cleanupDay?.let { _ ->
             val date = cleanupDay.timestamp.toJSDate()
 
-            +"Next: ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()}"
+            +"Nächster CleanupDay: id=${cleanupDay.id}: ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()}"
 
-            // TODO is delete button with warning dialog
-        } ?: run {
-            +"Next CleanupDay is not set"
-
-            ReactHTML.form {
-                ReactHTML.input {
-                    type = InputType.date
-                    required = true
-                    onChange = {
-                        setDateInput(it.target.value)
-                        console.log(it.target.value)
+            ReactHTML.dialog {
+                +"Wirklich? Das löscht alle Events und sonstige Daten"
+                open = warningDialog
+                ReactHTML.div {
+                    ReactHTML.button {
+                        +"Doch nicht!"
+                        onClick = {
+                            setWarningDialog(false)
+                        }
                     }
-                }
-                ReactHTML.input {
-                    type = InputType.file
-                    required = true
-                    onChange = {
-                        val fileReader = FileReader()
-
-                        fileReader.readAsArrayBuffer(it.target.files!![0])
-
-                        fileReader.onload = { e ->
-                            setImageInput(e.target!!.result as ArrayBuffer)
+                    ReactHTML.button {
+                        +"Wirklich löschen!"
+                        onClick = {
+                            props.admin.delete("/data/cleanupDay/${cleanupDay.id}") {
+                                if(it == DeletedCleanupDay)  {
+                                    props.setCleanupDay(null)
+                                }
+                            }
                         }
                     }
                 }
+            }
+
+            ReactHTML.div {
                 ReactHTML.button {
-                    +"Create CleanupDay"
+                    +"Löschen"
+                    onClick = {
+                        setWarningDialog(true)
+                    }
+                }
+            }
+        } ?: run {
+            +"Nächster CleanupDay ist noch nicht erstellt worden"
+
+            ReactHTML.form {
+                ReactHTML.div {
+                    +"Datum:\t"
+                    ReactHTML.input {
+                        type = InputType.date
+                        required = true
+                        onChange = {
+                            setDateInput(it.target.value)
+                            console.log(it.target.value)
+                        }
+                    }
+                }
+                ReactHTML.div {
+                    +"Logo:\t"
+                    ReactHTML.input {
+                        type = InputType.file
+                        required = true
+                        onChange = {
+                            val fileReader = FileReader()
+
+                            fileReader.readAsArrayBuffer(it.target.files!![0])
+
+                            fileReader.onload = { e ->
+                                setImageInput(e.target!!.result as ArrayBuffer)
+                            }
+                        }
+                    }
+                }
+                ReactHTML.div {
+                    ReactHTML.button {
+                        +"Create CleanupDay"
+                    }
                 }
                 onSubmit = {
                     it.preventDefault()
                     val date = Instant.fromEpochMilliseconds(Date.parse(dateInput).toLong())
 
                     MainScope().launch {
+                        @Suppress("CAST_NEVER_SUCCEEDS") // it evidently does succeed
                         val image = imageInput!!.run { Int8Array(this) as ByteArray }
 
                         props.admin.postImage(
-                            "/admin/data/cleanupDay",
+                            "/data/cleanupDay",
                             image,
                             CreateCleanupDay(date)
                         ) { maybeMessage ->
@@ -133,8 +179,9 @@ private val PasswordForm = FC<PasswordFormProps> { props ->
         onSubmit = {
             it.preventDefault()
             val adminRequests = Requests.AdminRequests(usernameInput, passwordInput)
-            adminRequests.get("/admin/login") {
+            adminRequests.get("/login") {
                 if (it.status == HttpStatusCode.OK) {
+                    window.localStorage.set(AdminPassword, passwordInput)
                     props.setAdmin(adminRequests)
                 }
             }
@@ -153,10 +200,23 @@ object AdminPage : RoutePage {
     override val component: FC<OverviewProps>
         get() = FC { props ->
             ReactHTML.div {
-                +"Admin"
+                ReactHTML.h3 {
+                    +"Admin"
+                }
 
                 val (admin, setAdmin) = useState<Requests.AdminRequests?>(null)
-                val (state, setState) = useState<AdminState>(AdminState.CreateEventState)
+                val (state, setState) = useState(AdminState.CreateEventState)
+
+                window.localStorage[AdminPassword]?.let { password ->
+                    val adminRequests = Requests.AdminRequests("admin", password)
+                    adminRequests.get("/login") {
+                        if (it.status == HttpStatusCode.OK) {
+                            setAdmin(adminRequests)
+                        } else {
+                            window.localStorage.removeItem(AdminPassword)
+                        }
+                    }
+                }
 
                 admin?.let {
                     ReactHTML.div {
