@@ -1,5 +1,6 @@
 package components
 
+import HeaderButton
 import css.ClassNames
 import emotion.react.css
 import pages.*
@@ -15,36 +16,6 @@ import web.html.HTMLButtonElement
 private const val DEFAULT_LOGO = "/static/WCD-logo-no-date.png"
 
 private typealias MenuButton = Triple<RoutePage, String, String>
-
-private external interface HeaderButtonProps : Props {
-    var text: String
-    var color: Color
-    var disabled: Boolean
-    var width: Width
-    var margin: Margin
-    var onClick: MouseEventHandler<HTMLButtonElement>
-}
-
-private val HeaderButton = FC<HeaderButtonProps> { props ->
-    ReactHTML.button {
-        +props.text
-        css {
-            width = props.width
-            margin = props.margin
-            height = 80.px
-            padding = 15.px
-            margin = 20.px
-            float = Float.right
-            background = props.color
-            if (props.disabled) {
-                background = Color(Style.greyColor)
-                textDecoration = TextDecoration.lineThrough
-            }
-        }
-        disabled = props.disabled
-        onClick = props.onClick
-    }
-}
 
 private external interface MenuProps : Props {
     var fileName: String?
