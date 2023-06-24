@@ -13,7 +13,6 @@ object Admin : IntIdTable() {
     val password = varchar("password", 10)
 }
 
-// TODO serializable?
 class AdminDao(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<AdminDao>(Admin) {
         fun insert(new: String) = transaction { new { password = new } }

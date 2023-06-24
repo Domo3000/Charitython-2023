@@ -1,11 +1,11 @@
 package pages
 
-import components.RouteState
+import components.RoutePage
 import react.FC
 import react.Props
 import react.dom.html.ReactHTML
 
-object ImpressumState : RouteState {
+object ImpressumPage : RoutePage {
     override val route: String = "impressum"
     override val component: FC<Props>
         get() = FC {

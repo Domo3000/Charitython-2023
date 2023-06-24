@@ -35,12 +35,12 @@ private val notFound = FC<Props> {
 }
 
 val Routing = FC<Props> {
-    val routeStates = listOf(
-        AdminState,
-        ImpressumState,
-        OrganizeState,
-        ShareResultsState,
-        SignUpState
+    val pages = listOf(
+        AdminPage,
+        ImpressumPage,
+        RegisterCleanupEvent,
+        ShareResultsPage,
+        SignUpPage
     )
 
     BrowserRouter {
@@ -49,15 +49,15 @@ val Routing = FC<Props> {
                 index = true
                 element = createElement(overview())
             }
-            routeStates.forEach { routeState ->
+            pages.forEach { page ->
                 PathRoute {
-                    path = "/${routeState.route}"
-                    element = createElement(overview(routeState))
+                    path = "/${page.route}"
+                    element = createElement(overview(page))
                 }
             }
             PathRoute {
                 path = "/details/:id"
-                element = createElement(overview(DetailsState(null)))
+                element = createElement(overview(DetailsPage(null)))
             }
 
             PathRoute {

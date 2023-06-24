@@ -35,6 +35,8 @@ dependencies {
     implementation("org.postgresql:postgresql:42.6.0")
     runtimeOnly("com.h2database:h2:2.1.214")
 
+    implementation("com.sksamuel.scrimage:scrimage-core:4.0.37")
+
     implementation("org.jetbrains.kotlin-wrappers:kotlin-css:1.0.0-pre.388")
     implementation("ch.qos.logback:logback-classic:1.2.11") // TODO 1.4.1
 

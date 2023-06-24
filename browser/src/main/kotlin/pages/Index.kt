@@ -1,15 +1,14 @@
 package pages
 
-import components.HeaderButton
+import components.OverviewPage
 import components.OverviewProps
-import components.OverviewState
 import emotion.react.css
 import react.FC
 import react.dom.html.ReactHTML
 import utils.Style
 import web.cssom.*
 
-object IndexState : OverviewState {
+object IndexPage : OverviewPage {
     override val component: FC<OverviewProps>
         get() = FC { props ->
             ReactHTML.div {
