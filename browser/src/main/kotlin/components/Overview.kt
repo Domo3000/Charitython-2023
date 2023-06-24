@@ -36,12 +36,6 @@ object NotFoundPage : OverviewPage {
     }
 }
 
-private object CountdownStyleCommons {
-    val fontSize = 2.5.em
-    val padding = Padding(0.em, 1.em, 0.em, 1.em)
-    val textColor = Color(Style.whiteColor)
-}
-
 fun overview(component: OverviewPage = IndexPage) = FC<Props> {
     val (page, setPage) = useState(component)
     val (cleanupDay, setCleanupDay) = useState<CleanupDayDTO?>(null)
@@ -58,15 +52,6 @@ fun overview(component: OverviewPage = IndexPage) = FC<Props> {
     }
 
     ReactHTML.div {
-        css {
-            backgroundImage = url("/static/landing-background-1.jpeg")
-            backgroundRepeat = BackgroundRepeat.noRepeat
-            backgroundSize = BackgroundSize.cover
-            backgroundAttachment = BackgroundAttachment.fixed
-            height = 100.vh
-        }
-
-
         ReactHTML.div {
             id = "content-holder"
             css {
@@ -79,124 +64,10 @@ fun overview(component: OverviewPage = IndexPage) = FC<Props> {
         }
     }
 
-    ReactHTML.div {
-        css {
-            height = 100.vh
-            backgroundColor = Color(Style.backgroundColor)
-            display = Display.flex
-            flexDirection = FlexDirection.column
-            justifyContent = JustifyContent.spaceEvenly
-            margin = Auto.auto
-        }
-
-        ReactHTML.h2 {
-            css {
-                textAlign = TextAlign.center
-                fontSize = 4.em
-                color = CountdownStyleCommons.textColor
-            }
-
-            +"World Cleanup Day 2023"
-        }
-
-        ReactHTML.h3 {
-            css {
-                textAlign = TextAlign.center
-                fontSize = 3.em
-                color = CountdownStyleCommons.textColor
-            }
-
-            +"Wir setzen weltweit ein Zeichen für den Umweltschutz!"
-        }
-
-        ReactHTML.div {
-            css {
-                display = Display.flex
-                flexDirection = FlexDirection.row
-                gap = 4.em
-                justifyContent = JustifyContent.center
-            }
-
-            ReactHTML.div {
-                css {
-                    backgroundColor = Color(Style.yellowColor)
-                    fontSize = CountdownStyleCommons.fontSize
-                    padding = CountdownStyleCommons.padding
-                }
-
-                ReactHTML.p {
-                    css {
-                        color = CountdownStyleCommons.textColor
-                    }
-                    +"XY Tage"
-                }
-            }
-
-            ReactHTML.div {
-                css {
-                    backgroundColor = Color(Style.pinkColor)
-                    fontSize = CountdownStyleCommons.fontSize
-                    padding = CountdownStyleCommons.padding
-                }
-
-                ReactHTML.p {
-                    css {
-                        color = CountdownStyleCommons.textColor
-                    }
-                    +"XY Stunden"
-                }
-            }
-
-            ReactHTML.div {
-                css {
-                    backgroundColor = Color(Style.blueColor)
-                    fontSize = CountdownStyleCommons.fontSize
-                    padding = CountdownStyleCommons.padding
-                }
-
-                ReactHTML.p {
-                    css {
-                        color = CountdownStyleCommons.textColor
-                    }
-                    +"XY Minuten"
-                }
-            }
-        }
-
-        ReactHTML.div {
-            css {
-                marginLeft = Auto.auto
-                marginRight = Auto.auto
-                fontSize = 2.5.em
-                padding = Padding(0.em, 2.em)
-            }
-
-            ReactHTML.p {
-                css {
-                    textAlign = TextAlign.center
-                    color = CountdownStyleCommons.textColor
-                }
-
-                +"Am 16. September 2023 findet der World Cleanup Day statt. Weltweit werden an diesem Tag Straßen, Flüsse, Wälder "
-                +"und Strände von Müll befreit. Wir koordinieren dieses Event österreichweit."
-            }
-
-            ReactHTML.p {
-                css {
-                    textAlign = TextAlign.center
-                    color = CountdownStyleCommons.textColor
-                }
-
-                +"Mit unserem Engagement wollen wir weltweit ein Zeichen im Sinne des Umweltschutzes setzen und gleichzeitig in der "
-                +"Bevölkerung das Bewusstsein für Abfallvermeidung steigern."
-            }
-        }
-
-        page.component {
-            stateSetter = { route, newState -> changeState(route, newState) }
-            this.cleanupDay = cleanupDay
-            this.setCleanupDay = setCleanupDay
-        }
+    page.component {
+        stateSetter = { route, newState -> changeState(route, newState) }
+        this.cleanupDay = cleanupDay
+        this.setCleanupDay = setCleanupDay
     }
 
     Footer { stateSetter = { route, newState -> changeState(route, newState) } }
