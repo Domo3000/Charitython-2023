@@ -52,22 +52,18 @@ fun overview(component: OverviewPage = IndexPage) = FC<Props> {
     }
 
     ReactHTML.div {
-        ReactHTML.div {
-            id = "content-holder"
-            css {
-                margin = Auto.auto
-                maxWidth = 1000.px
-                minHeight = 600.px
-                paddingBottom = 200.px
-                clear = Clear.left
-            }
+        id = "content-holder"
+        css {
+            minHeight = 600.px
+            paddingBottom = 200.px
+            clear = Clear.left
         }
-    }
 
-    page.component {
-        stateSetter = { route, newState -> changeState(route, newState) }
-        this.cleanupDay = cleanupDay
-        this.setCleanupDay = setCleanupDay
+        page.component {
+            stateSetter = { route, newState -> changeState(route, newState) }
+            this.cleanupDay = cleanupDay
+            this.setCleanupDay = setCleanupDay
+        }
     }
 
     Footer { stateSetter = { route, newState -> changeState(route, newState) } }

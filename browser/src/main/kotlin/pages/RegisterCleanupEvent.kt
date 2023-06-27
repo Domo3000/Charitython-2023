@@ -2,6 +2,9 @@ package pages
 
 import components.OverviewProps
 import components.RoutePage
+import css.Classes
+import emotion.css.css
+import emotion.react.css
 import kotlinx.datetime.toJSDate
 import model.CleanUpEventDTO
 import model.CleanupDayDTO
@@ -175,25 +178,29 @@ object RegisterCleanupEvent : RoutePage {
     override val route: String = "register-event"
     override val component: FC<OverviewProps>
         get() = FC { props ->
-            ReactHTML.h3 {
-                +"Cleanup anmelden"
-            }
+            ReactHTML.div {
+                css(Classes.limitedWidth)
 
-            props.cleanupDay?.let { cleanupDay ->
-                ReactHTML.div {
-                    val date = cleanupDay.timestamp.toJSDate()
-
-                    +"Wir freuen uns sehr, dass du als Organisator:in beim World Cleanup Day am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} dabei sein möchtest! Bitte füll das folgende Formular aus."
+                ReactHTML.h3 {
+                    +"Cleanup anmelden"
                 }
 
-                RegisterForm { }
-            } ?: run {
-                ReactHTML.div {
-                    +"Wir freuen uns sehr, dass du als Organisator:in beim nächsten World Cleanup Day dabei sein möchtest!"
-                }
-                ReactHTML.br {}
-                ReactHTML.div {
-                    +"Leider ist dieser noch nicht festgelegt worden!"
+                props.cleanupDay?.let { cleanupDay ->
+                    ReactHTML.div {
+                        val date = cleanupDay.timestamp.toJSDate()
+
+                        +"Wir freuen uns sehr, dass du als Organisator:in beim World Cleanup Day am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} dabei sein möchtest! Bitte füll das folgende Formular aus."
+                    }
+
+                    RegisterForm { }
+                } ?: run {
+                    ReactHTML.div {
+                        +"Wir freuen uns sehr, dass du als Organisator:in beim nächsten World Cleanup Day dabei sein möchtest!"
+                    }
+                    ReactHTML.br {}
+                    ReactHTML.div {
+                        +"Leider ist dieser noch nicht festgelegt worden!"
+                    }
                 }
             }
         }

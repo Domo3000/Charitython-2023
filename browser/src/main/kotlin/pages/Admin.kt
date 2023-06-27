@@ -2,6 +2,7 @@ package pages
 
 import components.OverviewProps
 import components.RoutePage
+import css.Classes
 import emotion.react.css
 import io.ktor.http.*
 import js.buffer.ArrayBuffer
@@ -200,6 +201,7 @@ object AdminPage : RoutePage {
     override val component: FC<OverviewProps>
         get() = FC { props ->
             ReactHTML.div {
+                css(Classes.limitedWidth)
                 ReactHTML.h3 {
                     +"Admin"
                 }

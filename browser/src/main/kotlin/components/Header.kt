@@ -1,17 +1,14 @@
 package components
 
-import HeaderButton
 import css.ClassNames
 import emotion.react.css
 import pages.*
 import react.FC
 import react.Props
-import react.dom.events.MouseEventHandler
 import react.dom.html.ReactHTML
 import react.useState
 import utils.Style
 import web.cssom.*
-import web.html.HTMLButtonElement
 
 private const val DEFAULT_LOGO = "/static/WCD-logo-no-date.png"
 
@@ -120,7 +117,7 @@ private val DesktopHeader = FC<MenuProps> { props ->
     }
 }
 
-object ButtonColorPicker {
+private object ButtonColorPicker {
     val colors = listOf(Style.yellowColor, Style.pinkColor, Style.blueColor)
     var next = 0
 

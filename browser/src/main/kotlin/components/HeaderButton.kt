@@ -1,3 +1,5 @@
+package components
+
 import emotion.react.css
 import react.FC
 import react.Props
