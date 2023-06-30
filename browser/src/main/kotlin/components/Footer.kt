@@ -2,7 +2,7 @@ package components
 
 import css.Classes
 import emotion.react.css
-import pages.ImpressumState
+import pages.ImpressumPage
 import react.FC
 import react.dom.html.ReactHTML
 import web.cssom.Clear
@@ -14,7 +14,7 @@ val Footer = FC<OverviewProps> { props ->
         }
         ReactHTML.h6 {
             css(Classes.centered)
-            onClick = { props.stateSetter("/${ImpressumState.route}", ImpressumState) }
+            onClick = { props.stateSetter("/${ImpressumPage.route}", ImpressumPage) }
             +"Impressum"
         }
     }

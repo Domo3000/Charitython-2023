@@ -1,29 +1,31 @@
 package components
 
 import emotion.react.css
-import pages.IndexState
-import react.FC
-import react.Props
+import model.CleanupDayDTO
+import pages.IndexPage
+import react.*
 import react.dom.html.ReactHTML
-import react.useState
+import utils.Requests
 import web.cssom.Auto
 import web.cssom.Clear
 import web.cssom.px
 import web.history.history
 
 external interface OverviewProps : Props {
-    var stateSetter: (String, OverviewState) -> Unit
+    var stateSetter: (String, OverviewPage) -> Unit
+    var cleanupDay: CleanupDayDTO?
+    var setCleanupDay: StateSetter<CleanupDayDTO?>
 }
 
-interface OverviewState {
+interface OverviewPage {
     val component: FC<OverviewProps>
 }
 
-interface RouteState : OverviewState {
+interface RoutePage : OverviewPage {
     val route: String
 }
 
-object NotFoundState : OverviewState {
+object NotFoundPage : OverviewPage {
     override val component = FC<Props> {
         ReactHTML.div {
             +"404 - Not Found"
@@ -31,17 +33,19 @@ object NotFoundState : OverviewState {
     }
 }
 
-fun overview(component: OverviewState = IndexState) = FC<Props> {
-    val (state, setState) = useState(component)
+fun overview(component: OverviewPage = IndexPage) = FC<Props> {
+    val (page, setPage) = useState(component)
+    val (cleanupDay, setCleanupDay) = useState<CleanupDayDTO?>(null)
 
-    fun changeState(route: String, newState: OverviewState) {
+    fun changeState(route: String, newState: OverviewPage) {
         history.replaceState(Unit, "", route)
-        setState(newState)
+        setPage(newState)
     }
 
     Header {
-        currentState = state
-        stateSetter = { route, newState -> changeState(route, newState) }
+        fileName = cleanupDay?.fileName?.let { "/files/$it" }
+        currentPage = page
+        pageSetter = { route, newState -> changeState(route, newState) }
     }
 
     ReactHTML.div {
@@ -54,8 +58,18 @@ fun overview(component: OverviewState = IndexState) = FC<Props> {
             clear = Clear.left
         }
 
-        state.component { stateSetter = { route, newState -> changeState(route, newState) } }
+        page.component {
+            stateSetter = { route, newState -> changeState(route, newState) }
+            this.cleanupDay = cleanupDay
+            this.setCleanupDay = setCleanupDay
+        }
     }
 
     Footer { stateSetter = { route, newState -> changeState(route, newState) } }
+
+    useEffectOnce {
+        Requests.getMessage("/data/cleanupDay") {
+            setCleanupDay(it as? CleanupDayDTO)
+        }
+    }
 }

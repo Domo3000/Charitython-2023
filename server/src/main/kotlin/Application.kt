@@ -16,50 +16,15 @@ import java.io.File
 import java.security.KeyStore
 import kotlin.random.Random
 
-suspend fun main(): Unit = coroutineScope {
-    val keystoreFile = File("${System.getProperty("user.dir")}/documents/keystore.jks")
-    val debug = try {
-        System.getenv("DEBUG") == "true"
-    } catch (_: Exception) {
-        false
-    }
-    val alias = try {
-        System.getenv("KEY_ALIAS")
-    } catch (_: Exception) {
-        "greenheroes.at"
-    }
+private fun getSystemCharArray(key: String) = System.getenv(key).toCharArray()
 
-    val environment = if (debug) {
-        applicationEngineEnvironment {
-            log = LoggerFactory.getLogger("ktor.application")
-            connector {
-                port = 8080
-            }
-            module {
-                body(debug)
-            }
-        }
-    } else {
-        applicationEngineEnvironment {
-            log = LoggerFactory.getLogger("ktor.application")
-            connector {
-                port = 8080
-            }
-            sslConnector(
-                keyStore = KeyStore.getInstance(keystoreFile, System.getenv("KEYSTORE_PASSWORD").toCharArray()),
-                keyAlias = alias,
-                keyStorePassword = { System.getenv("KEYSTORE_PASSWORD").toCharArray() },
-                privateKeyPassword = { System.getenv("KEYSTORE_PASSWORD").toCharArray() }) {
-                port = 8443
-                keyStorePath = keystoreFile
-            }
-            module {
-                body(debug)
-            }
-        }
-    }
-
-    embeddedServer(Netty, environment).start(wait = true)
+private fun generatePassword(length: Int = 10): String {
+    val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+    val salt = Integer.valueOf(System.getenv("RANDOM_SALT") ?: "666")
+    val random = Random(System.currentTimeMillis() / salt)
+    return (1..10).map {
+        random.nextInt(0, charPool.size).let { charPool[it] }
+    }.joinToString("")
 }
 
 private fun Application.body(debug: Boolean) {
@@ -73,20 +38,10 @@ private fun Application.body(debug: Boolean) {
             Connection(url, user, password)
         }
 
-        logInfo("password is" + (AdminDao.getLatest()?.let { ": ${it.password}" } ?: " empty"))
+        val password = generatePassword()
 
-        val password = AdminDao.getLatest()?.password ?: run {
-            val charPool : List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-            val random = Random(System.currentTimeMillis())
-            val newPass = (1..10).map {
-                random.nextInt(0, charPool.size).let { charPool[it] }
-            }.joinToString("")
-
-            AdminDao.insert(newPass)
-            logInfo("generated new password: $newPass")
-
-            newPass
-        }
+        AdminDao.insert(password)
+        logInfo("generated new password: $password")
 
         authentication {
             basic(BASIC_AUTH) {
@@ -114,10 +69,57 @@ private fun Application.body(debug: Boolean) {
         install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true
-                isLenient = true
+                ignoreUnknownKeys = true
+                classDiscriminator = "class"
             })
         }
 
         installRouting()
     }
+}
+
+suspend fun main(): Unit = coroutineScope {
+    val keystoreFile = File("${System.getProperty("user.dir")}/documents/keystore.jks")
+    val debug = try {
+        System.getenv("DEBUG") == "true"
+    } catch (_: Exception) {
+        false
+    }
+    val alias = try {
+        System.getenv("KEY_ALIAS")
+    } catch (_: Exception) {
+        "worldcleanupday.at"
+    }
+
+    val environment = if (debug) {
+        applicationEngineEnvironment {
+            log = LoggerFactory.getLogger("ktor.application")
+            connector {
+                port = 8080
+            }
+            module {
+                body(debug)
+            }
+        }
+    } else {
+        applicationEngineEnvironment {
+            log = LoggerFactory.getLogger("ktor.application")
+            connector {
+                port = 8080
+            }
+            sslConnector(
+                keyStore = KeyStore.getInstance(keystoreFile, getSystemCharArray("KEYSTORE_PASSWORD")),
+                keyAlias = alias,
+                keyStorePassword = { getSystemCharArray("KEYSTORE_PASSWORD") },
+                privateKeyPassword = { getSystemCharArray("KEYSTORE_PASSWORD") }) {
+                port = 8443
+                keyStorePath = keystoreFile
+            }
+            module {
+                body(debug)
+            }
+        }
+    }
+
+    embeddedServer(Netty, environment).start(wait = true)
 }
