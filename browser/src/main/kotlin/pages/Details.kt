@@ -129,27 +129,29 @@ class DetailsPage : OverviewPage {
     override val component: FC<OverviewProps>
         get() = FC { props ->
             val eventId = useParams()["id"]!!
-            val cleanupDayDate =
-                props.cleanupDay?.timestamp?.toJSDate()?.toLocaleDateString("de-AT", dateLocaleOptions {
-                    day = "2-digit"
-                    month = "2-digit"
-                    year = "numeric"
-                })
             val (cleanUpEvent, setCleanupEvent) = useState<CleanUpEventDTO?>(null)
 
             ReactHTML.div {
                 css(Classes.limitedWidth)
                 cleanUpEvent?.let {
+                    val cleanupDayDate =
+                        props.cleanupDay!!.timestamp.toJSDate().toLocaleDateString("de-AT", dateLocaleOptions {
+                            day = "2-digit"
+                            month = "2-digit"
+                            year = "numeric"
+                        })
                     CleanupDetails {
-                        this.cleanupDayDate = cleanupDayDate!!
+                        this.cleanupDayDate = cleanupDayDate
                         this.cleanUpEvent = it
                     }
                 }
             }
 
             useEffectOnce {
-                Requests.getMessage("/data/cleanupEvent/$eventId") {
-                    setCleanupEvent((it as CleanUpEventDTO))
+                props.cleanupDay?.let {
+                    Requests.getMessage("/data/cleanupEvent/$eventId") {
+                        setCleanupEvent((it as CleanUpEventDTO))
+                    }
                 }
             }
 
