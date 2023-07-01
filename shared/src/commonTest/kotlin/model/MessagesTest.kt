@@ -9,7 +9,7 @@ class MessagesTest {
     fun serialize() {
         val messages: Set<Message> = setOf(
             CreateCleanupDay(Clock.System.now()),
-            CleanupDayDTO(1, Clock.System.now())
+            CleanupDayDTO(1, Clock.System.now(), "fileName")
         )
 
         messages.forEach {

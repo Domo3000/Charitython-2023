@@ -6,4 +6,5 @@ object Style {
     const val yellowColor = "#ffc20e"
     const val pinkColor = "#e11383"
     const val blueColor = "#3e8ede"
+    const val whiteColor = "#ffffff"
 }
