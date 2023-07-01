@@ -34,7 +34,7 @@ class CleanupDayDao(id: EntityID<Int>) : IntEntity(id) {
             }.orderBy(CleanupDay.date to SortOrder.ASC).firstOrNull()
         }
         fun deleteById(id: Int) = transaction {
-            CleanupDay.deleteWhere { CleanupDay.id eq id }
+            CleanupDay.deleteWhere { CleanupDay.id eq id } // TODO cascade
         }
     }
 

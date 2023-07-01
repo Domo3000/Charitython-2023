@@ -121,7 +121,7 @@ private val CreateEventForm = FC<AdminProps> { props ->
                     it.preventDefault()
                     val date = Instant.fromEpochMilliseconds(Date.parse(dateInput).toLong())
 
-                    MainScope().launch {
+                    //MainScope().launch {
                         @Suppress("CAST_NEVER_SUCCEEDS") // it evidently does succeed
                         val image = imageInput!!.run { Int8Array(this) as ByteArray }
 
@@ -132,7 +132,7 @@ private val CreateEventForm = FC<AdminProps> { props ->
                         ) { maybeMessage ->
                             props.setCleanupDay(maybeMessage as? CleanupDayDTO)
                         }
-                    }
+                   // }
                 }
             }
         }

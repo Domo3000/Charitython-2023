@@ -53,6 +53,34 @@ object Requests {
         }
     }
 
+    // TODO handle Admin requests better, maybe optional Auth parameter?
+    fun postImage(url: String, image: ByteArray, body: Message, callback: (Message?) -> Unit) {
+        MainScope().launch {
+            var message: Message? = null
+
+            val response = client.submitFormWithBinaryData(url,
+                formData {
+                    append("image", image, Headers.build {
+                        append(HttpHeaders.ContentType, ContentType.Image.PNG)
+                        append(HttpHeaders.ContentDisposition, "filename=image.png")
+                    })
+                    append("message", body.encode(), Headers.build {
+                        append(HttpHeaders.ContentType, ContentType.Application.Json)
+                    })
+                }) {
+                onUpload { bytesSentTotal, contentLength ->
+                    console.log("$bytesSentTotal / $contentLength")
+                }
+            }
+
+            if (response.status.isSuccess()) {
+                message = Messages.decode(response.bodyAsText())
+            }
+
+            callback(message)
+        }
+    }
+
     class AdminRequests(private val username: String, private val password: String) {
         private val prefix = "/admin"
 
