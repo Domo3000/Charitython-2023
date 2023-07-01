@@ -30,7 +30,7 @@ object SignUpPage : RoutePage {
                 css(Classes.limitedWidth)
                 +"TODO"
 
-                if(events.isNotEmpty()) {
+                if (events.isNotEmpty()) {
                     ReactHTML.div {
                         css {
                             height = 800.px
@@ -43,7 +43,7 @@ object SignUpPage : RoutePage {
             }
 
             useEffect(events) {
-                if(events.isNotEmpty()) {
+                if (events.isNotEmpty()) {
                     hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
                         val map = LeafletObjectFactory.map(ktxDocument.getElementById("map-holder")!! as HTMLElement) {
                             center = LatLng(47, 11) // TODO center a bit better
@@ -69,7 +69,7 @@ object SignUpPage : RoutePage {
 
                             marker.on(
                                 "click",
-                                { props.stateSetter("/details/${event.id}", DetailsPage(event.id.toString())) })
+                                { props.stateSetter("/details/${event.id}", DetailsPage()) })
 
                             marker.addTo(map)
                         }
