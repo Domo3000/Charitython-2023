@@ -5,46 +5,14 @@ import emotion.react.css
 import pages.*
 import react.FC
 import react.Props
-import react.dom.events.MouseEventHandler
 import react.dom.html.ReactHTML
 import react.useState
 import utils.Style
 import web.cssom.*
-import web.html.HTMLButtonElement
 
 private const val DEFAULT_LOGO = "/static/WCD-logo-no-date.png"
 
 private typealias MenuButton = Triple<RoutePage, String, String>
-
-private external interface HeaderButtonProps : Props {
-    var text: String
-    var color: Color
-    var disabled: Boolean
-    var width: Width
-    var margin: Margin
-    var onClick: MouseEventHandler<HTMLButtonElement>
-}
-
-private val HeaderButton = FC<HeaderButtonProps> { props ->
-    ReactHTML.button {
-        +props.text
-        css {
-            width = props.width
-            margin = props.margin
-            height = 80.px
-            padding = 15.px
-            margin = 20.px
-            float = Float.right
-            background = props.color
-            if (props.disabled) {
-                background = Color(Style.greyColor)
-                textDecoration = TextDecoration.lineThrough
-            }
-        }
-        disabled = props.disabled
-        onClick = props.onClick
-    }
-}
 
 private external interface MenuProps : Props {
     var fileName: String?
@@ -149,7 +117,7 @@ private val DesktopHeader = FC<MenuProps> { props ->
     }
 }
 
-object ButtonColorPicker {
+private object ButtonColorPicker {
     val colors = listOf(Style.yellowColor, Style.pinkColor, Style.blueColor)
     var next = 0
 

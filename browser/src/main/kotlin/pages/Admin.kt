@@ -2,6 +2,7 @@ package pages
 
 import components.OverviewProps
 import components.RoutePage
+import css.Classes
 import emotion.react.css
 import io.ktor.http.*
 import js.buffer.ArrayBuffer
@@ -120,7 +121,7 @@ private val CreateEventForm = FC<AdminProps> { props ->
                     it.preventDefault()
                     val date = Instant.fromEpochMilliseconds(Date.parse(dateInput).toLong())
 
-                    MainScope().launch {
+                    //MainScope().launch {
                         @Suppress("CAST_NEVER_SUCCEEDS") // it evidently does succeed
                         val image = imageInput!!.run { Int8Array(this) as ByteArray }
 
@@ -131,7 +132,7 @@ private val CreateEventForm = FC<AdminProps> { props ->
                         ) { maybeMessage ->
                             props.setCleanupDay(maybeMessage as? CleanupDayDTO)
                         }
-                    }
+                   // }
                 }
             }
         }
@@ -200,6 +201,7 @@ object AdminPage : RoutePage {
     override val component: FC<OverviewProps>
         get() = FC { props ->
             ReactHTML.div {
+                css(Classes.limitedWidth)
                 ReactHTML.h3 {
                     +"Admin"
                 }

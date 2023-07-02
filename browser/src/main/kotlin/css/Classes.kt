@@ -11,6 +11,11 @@ object Classes {
         textAlign = TextAlign.center
     }
 
+    val limitedWidth: CSS = {
+        margin = Auto.auto
+        maxWidth = 1000.px
+    }
+
     val hidden: CSS = {
         display = None.none
     }
