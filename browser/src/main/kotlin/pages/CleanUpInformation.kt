@@ -23,8 +23,7 @@ import react.create
 import react.dom.client.hydrateRoot
 import react.router.useParams
 import react.useEffectOnce
-import web.cssom.ClassName
-import web.cssom.pct
+import web.cssom.*
 
 import web.dom.document
 
@@ -53,65 +52,95 @@ class CleanUpInformation(private val id: String?) : OverviewPage {
                     +"Fruhjahrsputz in Schwaan (Mecklenburg-Vorpommern)"
                 }
 
-                css(ClassName("grid-container")) {
-                    // TODO: setup grid styling
-                }
-
                 ReactHTML.div {
-                    ReactHTML.h3 {
-                        +"WANN"
-                    }
-                    id = "cleanup-detail-when"
-
-                    css(ClassName("cleanup-detail-when-column")) {
-                        //gridColumn = GridAutoColumns();
+                    css(ClassName("grid-container")) {
+                        display = Display.grid
+                        gridTemplateColumns = array(Auto.auto, Auto.auto, Auto.auto)
                     }
 
                     ReactHTML.div {
+                        ReactHTML.h3 {
+                            +"WANN"
+                        }
+                        id = "cleanup-detail-when"
+
+                        css(ClassName("cleanup-detail-when-column")) {
+                            //gridColumn = GridAutoColumns();
+                        }
+
                         ReactHTML.div {
-                            id = "cleanup-detail-when-date"
+                            ReactHTML.div {
+                                id = "cleanup-detail-when-date"
+
+                                ReactHTML.i {
+                                    className = ClassName("far fa-calendar-alt")
+                                }
+
+                                ReactHTML.span {
+                                    +"12.05.2023"
+                                }
+                            }
+                            ReactHTML.div {
+                                id = "cleanup-detail-when-time"
+
+                                ReactHTML.i {
+                                    className = ClassName("far fa-clock")
+                                }
+                                ReactHTML.span {
+                                    +"08:00 Uhr - 12:30 Uhr"
+                                }
+                            }
+                            ReactHTML.div {
+                                id = "cleanup-detail-when-to-calendar"
+                            }
+                        }
+                    }
+
+                    ReactHTML.div {
+                        id = "cleanup-detail-where"
+                        ReactHTML.h3 {
+                            +"WO"
+                            css(ClassName("234234")) {
+                                width = 33.pct
+                            }
+                        }
+
+                        ReactHTML.div {
+                            id = "cleanup-detail-where-address"
 
                             ReactHTML.i {
-                                className = ClassName("far fa-calendar-alt")
+                                className = ClassName("fas fa-map-marker")
                             }
 
                             ReactHTML.span {
-                                +"12.05.2023"
+                                +"Schwaan"
+                            }
+
+                            ReactHTML.div {
+                                css {
+                                    maxWidth = 500.px
+                                }
+                                ReactHTML.span {
+                                    +"R.-Breitscheid-Str. 16, Mecklenburg Vorpommern, 18258, Landkreis Rostock"
+                                }
                             }
                         }
-                        ReactHTML.div {
-                            id = "cleanup-detail-when-time"
-                        }
-                        ReactHTML.div {
-                            id = "cleanup-detail-when-to-calendar"
-                        }
-                    }
-                }
 
-                ReactHTML.div {
-                    +"WO"
-                    id = "cleanup-detail-where"
-                    ReactHTML.h3 {
-                        +"WO"
-                        css(ClassName("234234")) {
-                            width = 33.pct
+
+                        ReactHTML.h3 {
+                            +"VERANSTALTUNGSTYP"
+
+                            css {
+
+                            }
                         }
                     }
 
+                    ReactHTML.div {
+                        +"Cleanup Icon"
 
-                    ReactHTML.h3 {
-                        +"VERANSTALTUNGSTYP"
-
-                        css {
-
-                        }
+                        id = "cleanup-detail-icon"
                     }
-                }
-
-                ReactHTML.div {
-                    +"Cleanup Icon"
-
-                    id = "cleanup-detail-icon"
                 }
 
                 ReactHTML.div {
@@ -119,7 +148,7 @@ class CleanUpInformation(private val id: String?) : OverviewPage {
                     +"Map Container"
 
                     css {
-                        //height = 500.px
+                        height = 500.px
                     }
                     id = "cleanup-detail-map-location-holder"
                 }
@@ -155,7 +184,7 @@ class CleanUpInformation(private val id: String?) : OverviewPage {
                         }
                         marker.addTo(map);
                     }.create()
-                    )
+                )
             }
         }
 }
