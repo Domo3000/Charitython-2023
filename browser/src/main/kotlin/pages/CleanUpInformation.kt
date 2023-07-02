@@ -1,7 +1,7 @@
 package pages
 
 import components.OverviewProps
-import components.OverviewState
+import components.OverviewPage
 import css.ClassNames
 import css.Classes.centered
 import css.and
@@ -28,7 +28,7 @@ import web.cssom.pct
 
 import web.dom.document
 
-class CleanUpInformation(private val id: String?) : OverviewState {
+class CleanUpInformation(private val id: String?) : OverviewPage {
     override val component: FC<OverviewProps>
         get() = FC { props ->
             val eventId = id ?: useParams()["id"]!!
