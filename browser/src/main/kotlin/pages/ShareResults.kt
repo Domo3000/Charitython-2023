@@ -3,7 +3,6 @@ package pages
 import components.RoutePage
 import css.Classes
 import emotion.react.css
-import emotion.react.css
 import kotlinx.datetime.Instant
 import model.CreateShareResultsEntity
 import react.*
@@ -20,7 +19,6 @@ data class FormField(
     var setter: StateSetter<String>
 )
 
-
 object ShareResultsPage : RoutePage {
     override val route: String = "share-results"
     override val component: FC<Props>
@@ -33,15 +31,15 @@ object ShareResultsPage : RoutePage {
                 val (postCode, setPostCode) = useState<String>("")
                 val (location, setLocation) = useState<String>("")
                 val (dateOfCleanup, setDateOfCleanup) = useState<String>("")
-                val (amountOfParticipants, setAmountOfParticipants) = useState<Int>(0)
-                val (totalWeight, setTotalWeight) = useState<Int>(0)
-                val (amountOfTrashBags, setAmountOfTrashBags) = useState<Int>(0)
+                val (amountOfParticipants, setAmountOfParticipants) = useState<String>("0")
+                val (totalWeight, setTotalWeight) = useState<String>("0")
+                val (amountOfTrashBags, setAmountOfTrashBags) = useState<String>("0")
                 val (partnerOrganisation, setPartnerOrganisation) = useState<String>("")
                 val (cleanedAreaSize, setCleanedAreaSize) = useState<String>("")
-                val (cigaretteButtsCount, setCigaretteButtsCount) = useState<Int>(0)
-                val (canCount, setCanCount) = useState<Int>(0)
-                val (petBottleCount, setPetBottleCount) = useState<Int>(0)
-                val (glassBottleCount, setGlassBottleCount) = useState<Int>(0)
+                val (cigaretteButtsCount, setCigaretteButtsCount) = useState<String>("0")
+                val (canCount, setCanCount) = useState<String>("0")
+                val (petBottleCount, setPetBottleCount) = useState<String>("0")
+                val (glassBottleCount, setGlassBottleCount) = useState<String>("0")
                 val (hazardousWaste, setHazardousWaste) = useState<String>("")
                 val (strangeFinds, setStrangeFinds) = useState<String>("")
                 val (miscellaneous, setMiscellaneous) = useState<String>("")
@@ -71,7 +69,7 @@ object ShareResultsPage : RoutePage {
 
 
                 ReactHTML.img {
-
+                    // TODO: Insert img here
                 }
 
                 ReactHTML.p {
@@ -111,32 +109,28 @@ object ShareResultsPage : RoutePage {
                     onSubmit = {
                         Requests.post("/shareresults", CreateShareResultsEntity(
                             timestamp = Instant.parse("01012020"),
-                            mail = mail,
-                            entity = entity,
-                            province = province,
-                            postCode = postCode,
-                            location = location,
+                            mail,
+                            entity,
+                            province,
+                            postCode,
+                            location,
                             dateOfCleanup = Instant.parse(dateOfCleanup),
-                            amountOfParticipants =  amountOfParticipants,
-                            totalWeight = totalWeight,
-                            amountOfTrashBags = amountOfTrashBags,
-                            partnerOrganisation = partnerOrganisation,
-                            cleanedAreaSize = cleanedAreaSize,
-                            cigaretteButtsCount = cigaretteButtsCount,
-                            canCount = canCount,
-                            petBottleCount = petBottleCount,
-                            glassBottleCount = glassBottleCount,
-                            hazardousWaste = hazardousWaste,
-                            strangeFinds = strangeFinds,
-                            miscellaneous = miscellaneous,
-                            wayOfRecognition = wayOfRecognition
-                        ))
+                            amountOfParticipants = amountOfParticipants.toInt(),
+                            totalWeight = totalWeight.toInt(),
+                            amountOfTrashBags = amountOfTrashBags.toInt(),
+                            partnerOrganisation,
+                            cleanedAreaSize,
+                            cigaretteButtsCount = cigaretteButtsCount.toInt(),
+                            canCount = canCount.toInt(),
+                            petBottleCount = petBottleCount.toInt(),
+                            glassBottleCount = glassBottleCount.toInt(),
+                            hazardousWaste,
+                            strangeFinds,
+                            miscellaneous,
+                            wayOfRecognition
+                        )
+                        ) {}
                     }
-
-                }
-
-                useEffect(mail) {
-                    console.log("Email")
                 }
             }
         }
