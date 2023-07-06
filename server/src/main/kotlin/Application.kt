@@ -38,7 +38,11 @@ private fun Application.body(debug: Boolean) {
             Connection(url, user, password)
         }
 
-        val password = generatePassword()
+        val password = if(debug) {
+            "admin"
+        } else {
+            generatePassword()
+        }
 
         AdminDao.insert(password)
         logInfo("generated new password: $password")

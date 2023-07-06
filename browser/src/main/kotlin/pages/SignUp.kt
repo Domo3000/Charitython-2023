@@ -69,7 +69,7 @@ object SignUpPage : RoutePage {
 
                             marker.on(
                                 "click",
-                                { props.stateSetter("/details/${event.id}", DetailsPage()) })
+                                { props.stateSetter("/details/${event.id}", DetailsPage(event.id)) })
 
                             marker.addTo(map)
                         }
@@ -78,8 +78,6 @@ object SignUpPage : RoutePage {
             }
 
             useEffectOnce {
-                MapsModule.initialize()
-
                 Requests.getMessage("/data/cleanupEvents") {
                     setEvents((it as CleanUpEvents).events)
                 }

@@ -214,8 +214,6 @@ private val RegisterForm = FC<Props> {
     }
 
     useEffectOnce {
-        MapsModule.initialize()
-
         hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
             val map = LeafletObjectFactory.map(ktxDocument.getElementById("map-holder")!! as HTMLElement) {
                 center = LatLng(47, 11) // TODO center a bit better

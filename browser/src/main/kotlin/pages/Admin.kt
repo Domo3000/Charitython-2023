@@ -202,7 +202,7 @@ object AdminPage : RoutePage {
         get() = FC { props ->
             ReactHTML.div {
                 css(Classes.limitedWidth)
-                ReactHTML.h3 {
+                ReactHTML.h1 {
                     +"Admin"
                 }
 

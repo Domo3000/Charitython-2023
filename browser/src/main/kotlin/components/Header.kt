@@ -25,7 +25,7 @@ private val PhoneHeader = FC<MenuProps> { props ->
     val (isMenuOpen, setMenuOpen) = useState(false)
 
     ReactHTML.div {
-        css(ClassNames.phoneElement) {
+        css(ClassNames.mobileElement) {
             height = 60.px
         }
 

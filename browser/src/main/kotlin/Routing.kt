@@ -14,26 +14,6 @@ import web.cssom.ObjectFit
 import web.cssom.px
 import web.location.location
 
-private val notFound = FC<Props> {
-    ReactHTML.div {
-        css(Classes.centered)
-        +"404 - Not Found"
-    }
-    ReactHTML.div {
-        css(Classes.centered)
-        ReactHTML.img {
-            css {
-                maxWidth = 300.px
-                objectFit = ObjectFit.contain
-            }
-            src = "/static/logo-oval.png"
-            onClick = {
-                location.assign("/")
-            }
-        }
-    }
-}
-
 val Routing = FC<Props> {
     val pages = listOf(
         AdminPage,
@@ -57,12 +37,12 @@ val Routing = FC<Props> {
             }
             PathRoute {
                 path = "/details/:id"
-                element = createElement(overview(DetailsPage()))
+                element = createElement(overview(DetailsPage(null)))
             }
 
             PathRoute {
                 path = "*"
-                element = createElement(notFound)
+                element = createElement(overview(NotFoundPage))
             }
         }
     }
