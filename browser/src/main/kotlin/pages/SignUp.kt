@@ -4,7 +4,6 @@ import components.OverviewProps
 import components.RoutePage
 import css.Classes
 import emotion.react.css
-import io.kvision.MapsModule
 import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.geo.LatLng
 import io.kvision.maps.externals.leaflet.geometry.Point
