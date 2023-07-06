@@ -4,7 +4,6 @@ import components.OverviewProps
 import components.RoutePage
 import css.Classes
 import emotion.react.css
-import io.kvision.MapsModule
 import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.geo.LatLng
 import io.kvision.maps.externals.leaflet.geometry.Point
@@ -30,7 +29,7 @@ object SignUpPage : RoutePage {
                 css(Classes.limitedWidth)
                 +"TODO"
 
-                if(events.isNotEmpty()) {
+                if (events.isNotEmpty()) {
                     ReactHTML.div {
                         css {
                             height = 800.px
@@ -43,7 +42,7 @@ object SignUpPage : RoutePage {
             }
 
             useEffect(events) {
-                if(events.isNotEmpty()) {
+                if (events.isNotEmpty()) {
                     hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
                         val map = LeafletObjectFactory.map(ktxDocument.getElementById("map-holder")!! as HTMLElement) {
                             center = LatLng(47, 11) // TODO center a bit better
@@ -69,7 +68,7 @@ object SignUpPage : RoutePage {
 
                             marker.on(
                                 "click",
-                                { props.stateSetter("/details/${event.id}", DetailsPage(event.id.toString())) })
+                                { props.stateSetter("/details/${event.id}", DetailsPage(event.id)) })
 
                             marker.addTo(map)
                         }
@@ -78,8 +77,6 @@ object SignUpPage : RoutePage {
             }
 
             useEffectOnce {
-                MapsModule.initialize()
-
                 Requests.getMessage("/data/cleanupEvents") {
                     setEvents((it as CleanUpEvents).events)
                 }

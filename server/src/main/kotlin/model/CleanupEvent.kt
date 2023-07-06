@@ -14,6 +14,7 @@ object CleanupEvent : IntIdTable() {
     val organization = varchar("organization", 100)
     val websiteAddress = varchar("website", 200)
     val eventName = varchar("eventName", 100)
+
     //val street = varchar("street", 100)
     //val zipCode = varchar("zipCode", 10)
     val latitude = double("latitude")
@@ -46,8 +47,13 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
                 this.fileName = fileName
             }
         }
+
         fun getAll(): List<CleanupEventDao> = transaction {
             all().toList()
+        }
+
+        fun getById(id: Int): CleanupEventDao? = transaction {
+            findById(id)
         }
     }
 
@@ -58,6 +64,7 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
     var organization by CleanupEvent.organization
     var websiteAddress by CleanupEvent.websiteAddress
     var eventName by CleanupEvent.eventName
+
     //var street by CleanupEvent.street
     //var zipCode by CleanupEvent.zipCode
     var latitude by CleanupEvent.latitude

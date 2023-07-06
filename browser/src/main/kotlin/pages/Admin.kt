@@ -8,8 +8,6 @@ import io.ktor.http.*
 import js.buffer.ArrayBuffer
 import js.typedarrays.Int8Array
 import kotlinx.browser.window
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toJSDate
 import model.CleanupDayDTO
@@ -202,7 +200,7 @@ object AdminPage : RoutePage {
         get() = FC { props ->
             ReactHTML.div {
                 css(Classes.limitedWidth)
-                ReactHTML.h3 {
+                ReactHTML.h1 {
                     +"Admin"
                 }
 
