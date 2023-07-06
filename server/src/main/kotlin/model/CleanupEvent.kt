@@ -4,7 +4,9 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 
 object CleanupEvent : IntIdTable() {
     val cleanupDayId = integer("cleanupDayId").references(CleanupDay.id)
@@ -14,7 +16,6 @@ object CleanupEvent : IntIdTable() {
     val organization = varchar("organization", 100)
     val websiteAddress = varchar("website", 200)
     val eventName = varchar("eventName", 100)
-
     //val street = varchar("street", 100)
     //val zipCode = varchar("zipCode", 10)
     val latitude = double("latitude")
@@ -23,6 +24,7 @@ object CleanupEvent : IntIdTable() {
     val endTime = varchar("endTime", 30)
     val description = varchar("description", 500)
     val fileName = varchar("fileName", 50)
+    var approved = bool("approved")
     // TODO approved field -> gets posted to admin page where it can be edited and approved
 }
 
@@ -45,15 +47,17 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
                 endTime = dto.endTime
                 description = dto.description
                 this.fileName = fileName
+                approved = false
             }
         }
-
         fun getAll(): List<CleanupEventDao> = transaction {
             all().toList()
         }
 
-        fun getById(id: Int): CleanupEventDao? = transaction {
-            findById(id)
+        fun approve(id: Int?, event: CleanUpEventCreationDTO) = transaction {
+            CleanupEvent.update({ CleanupEvent.id.eq(id) }) {
+                it[approved] = true
+            }
         }
     }
 
@@ -64,7 +68,6 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
     var organization by CleanupEvent.organization
     var websiteAddress by CleanupEvent.websiteAddress
     var eventName by CleanupEvent.eventName
-
     //var street by CleanupEvent.street
     //var zipCode by CleanupEvent.zipCode
     var latitude by CleanupEvent.latitude
@@ -73,6 +76,7 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
     var endTime by CleanupEvent.endTime
     var description by CleanupEvent.description
     var fileName by CleanupEvent.fileName
+    var approved by CleanupEvent.approved
 
     fun toDTO(): CleanUpEventDTO = CleanUpEventDTO(
         id.value,
@@ -88,6 +92,7 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
         startTime,
         endTime,
         description,
-        fileName
+        fileName,
+        approved
     )
 }

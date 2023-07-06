@@ -8,24 +8,23 @@ import io.ktor.http.*
 import js.buffer.ArrayBuffer
 import js.typedarrays.Int8Array
 import kotlinx.browser.window
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toJSDate
-import model.CleanupDayDTO
-import model.CreateCleanupDay
-import model.DeletedCleanupDay
+import model.*
 import org.w3c.dom.get
 import org.w3c.dom.set
-import react.FC
-import react.Props
-import react.StateSetter
+import react.*
 import react.dom.html.ReactHTML
-import react.useState
 import utils.Requests
 import utils.getMonthString
+import web.cssom.ClassName
 import web.cssom.Clear
 import web.cssom.Float
 import web.file.FileReader
 import web.html.InputType
+import web.prompts.alert
 import kotlin.js.Date
 
 private const val AdminPassword = "adminPassword"
@@ -138,8 +137,105 @@ private val CreateEventForm = FC<AdminProps> { props ->
 }
 
 private val RegisterEventForm = FC<AdminProps> { props ->
+
+    val (events, setEvents) = useState<List<CleanUpEventDTO>>(emptyList())
+
+
     ReactHTML.div {
         +"TODO list all registrations, have a editable form with an accept button for them"
+        ReactHTML.table {
+            ReactHTML.tr {
+                ReactHTML.th {
+                    + "Vorname"
+                    className = ClassName("event-header")
+                }
+
+                ReactHTML.th {
+                    + "Nachname"
+                }
+                ReactHTML.th {
+                    + "Email"
+                }
+                ReactHTML.th {
+                    + "Organisation"
+                }
+                ReactHTML.th {
+                    + "Web-Addresse"
+                }
+                ReactHTML.th {
+                    + "Event Name"
+                }
+                ReactHTML.th {
+                    + "Startzeit"
+                }
+                ReactHTML.th {
+                    + "Endzeit"
+                }
+                ReactHTML.th {
+                    + "Beschreibung"
+                }
+            }
+            ReactHTML.tbody {
+
+                events.filterNot { it.approved }.forEach { event ->
+                    ReactHTML.tr {
+                        ReactHTML.td {
+                            ReactHTML.span {
+                                + event.firstName
+                                className = ClassName("event-detail")
+                            }
+                        }
+                        ReactHTML.td {
+
+                            + event.lastName
+                        }
+                        ReactHTML.td {
+                            + event.emailAddress
+                        }
+                        ReactHTML.td {
+                            + event.organization
+                        }
+                        ReactHTML.td {
+                            + event.websiteAddress
+                        }
+                        ReactHTML.td {
+                            + event.eventName
+                        }
+                        ReactHTML.td {
+                            + event.startTime
+                        }
+                        ReactHTML.td {
+                            + event.endTime
+                        }
+                        ReactHTML.td {
+                            + event.description
+                        }
+                        ReactHTML.td {
+                            ReactHTML.button {
+                                ReactHTML.span {
+                                    + "Event akzeptieren"
+                                }
+                                name = "Event akzeptieren"
+                                onClick = {
+                                    props.admin.post("/data/approveEvent/${event.id}", event) {
+                                        alert("Approved event ${event.eventName}")
+                                        Requests.getMessage("/data/cleanupEvents") {
+                                            setEvents((it as CleanUpEvents).events)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    useEffectOnce {
+        Requests.getMessage("/data/cleanupEvents") {
+            setEvents((it as CleanUpEvents).events)
+        }
     }
 }
 
@@ -198,25 +294,17 @@ object AdminPage : RoutePage {
     override val route: String = "admin"
     override val component: FC<OverviewProps>
         get() = FC { props ->
+
+
+            val (admin, setAdmin) = useState<Requests.AdminRequests?>(null)
+            val (state, setState) = useState(AdminState.CreateEventState)
+
             ReactHTML.div {
                 css(Classes.limitedWidth)
-                ReactHTML.h1 {
+                ReactHTML.h3 {
                     +"Admin"
                 }
 
-                val (admin, setAdmin) = useState<Requests.AdminRequests?>(null)
-                val (state, setState) = useState(AdminState.CreateEventState)
-
-                window.localStorage[AdminPassword]?.let { password ->
-                    val adminRequests = Requests.AdminRequests("admin", password)
-                    adminRequests.get("/login") {
-                        if (it.status == HttpStatusCode.OK) {
-                            setAdmin(adminRequests)
-                        } else {
-                            window.localStorage.removeItem(AdminPassword)
-                        }
-                    }
-                }
 
                 admin?.let {
                     ReactHTML.div {
@@ -254,6 +342,8 @@ object AdminPage : RoutePage {
                         }
                     }
 
+
+
                     // TODO delete Day/Events
                     // TODO list all Event results with CSV export
                     // TODO accept Event Registrations
@@ -261,6 +351,20 @@ object AdminPage : RoutePage {
                 } ?: run {
                     PasswordForm {
                         this.setAdmin = setAdmin
+                    }
+                }
+            }
+
+            useEffectOnce {
+
+                window.localStorage[AdminPassword]?.let { password ->
+                    val adminRequests = Requests.AdminRequests("admin", password)
+                    adminRequests.get("/login") {
+                        if (it.status == HttpStatusCode.OK) {
+                            setAdmin(adminRequests)
+                        } else {
+                            window.localStorage.removeItem(AdminPassword)
+                        }
                     }
                 }
             }

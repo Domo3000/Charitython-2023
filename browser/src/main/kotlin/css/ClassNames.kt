@@ -3,7 +3,7 @@ package css
 import web.cssom.ClassName
 
 object ClassNames {
-    val mobileElement = ClassName("phone-element")
+    val phoneElement = ClassName("phone-element")
     val desktopElement = ClassName("desktop-element")
     val phoneFullWidth = ClassName("phone-full-width")
 }
