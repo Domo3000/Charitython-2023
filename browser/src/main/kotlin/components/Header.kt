@@ -25,7 +25,7 @@ private val PhoneHeader = FC<MenuProps> { props ->
     val (isMenuOpen, setMenuOpen) = useState(false)
 
     ReactHTML.div {
-        css(ClassNames.phoneElement) {
+        css(ClassNames.mobileElement) {
             height = 60.px
         }
 
@@ -133,7 +133,7 @@ external interface HeaderProps : Props {
 val Header = FC<HeaderProps> { props ->
     val buttons: List<MenuButton> = listOf(
         RegisterCleanupEvent to "Cleanup anmelden",
-        SignUpPage to "Cleanup finden",
+        FindCleanup to "Cleanup finden",
         ShareResultsPage to "Ergebnisse teilen"
     ).map { (page, text) -> Triple(page, ButtonColorPicker.nextColor(), text) }
 

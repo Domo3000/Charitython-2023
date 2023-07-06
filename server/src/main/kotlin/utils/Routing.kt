@@ -43,15 +43,15 @@ fun Application.installRouting() = routing {
             route("/data") {
 
                 post("/approveEvent/{id}") {
-                    val eventToApprove = call.receive<CleanUpEventCreationDTO>()
-                    val eventId = call.parameters["id"]?.toInt()
-                    System.out.println("EVENT ID TO APPROVE IS: $eventId")
-                    CleanupEventDao.approve(eventId, eventToApprove)
+                    val eventId = call.parameters["id"]!!.toInt()
+                    CleanupEventDao.approve(eventId)
                     call.respond(HttpStatusCode.OK)
                 }
 
                 delete("/deleteEvent/{id}") {
-
+                    val eventId = call.parameters["id"]!!.toInt()
+                    CleanupEventDao.delete(eventId)
+                    call.respond(HttpStatusCode.OK)
                 }
 
                 post("/cleanupDay") {
@@ -77,7 +77,7 @@ fun Application.installRouting() = routing {
                         }
                     }
 
-                    if(fileName == null) {
+                    if (fileName == null) {
                         call.respond(HttpStatusCode.BadRequest, "file was not a supported image")
                     } else {
                         CleanupDayDao.insert(date!!, fileName!!)
@@ -89,7 +89,7 @@ fun Application.installRouting() = routing {
                 delete("/cleanupDay/{id}") {
                     val id = Integer.parseInt(call.parameters["id"])
 
-                    if(CleanupDayDao.deleteById(id) == 1) {
+                    if (CleanupDayDao.deleteById(id) == 1) {
                         call.respondMessage(DeletedCleanupDay)
                     } else {
                         call.respond(HttpStatusCode.NotFound)
@@ -107,8 +107,18 @@ fun Application.installRouting() = routing {
                 call.respond(HttpStatusCode.NotFound, "current one might already be in past. next one is not set")
             }
         }
-        get("/cleanupEvents") {
-            val events = CleanupEventDao.getAll().map { it.toDTO() }
+        get("/cleanupEvent/{eventId}") {
+            val eventId = Integer.parseInt(call.parameters["eventId"])
+            val event = CleanupEventDao.getById(eventId)
+            event?.let {
+                call.respondMessage(event.toDTO())
+            } ?: run {
+                call.respond(HttpStatusCode.NotFound, "Did not find event for id $eventId")
+            }
+        }
+        get("/cleanupEvents/{cleanupDayId}") {
+            val cleanupDayId = Integer.parseInt(call.parameters["cleanupDayId"])
+            val events = CleanupEventDao.getAllByCleanupDayId(cleanupDayId).map { it.toDTO() }
             call.respondMessage(CleanUpEvents(events))
         }
         post("/cleanupEvent") {
@@ -129,7 +139,7 @@ fun Application.installRouting() = routing {
                 }
             }
 
-            if(fileName == null) {
+            if (fileName == null) {
                 call.respond(HttpStatusCode.BadRequest, "file was not a supported image")
             } else {
                 val new = CleanupEventDao.insert(dto!!, fileName!!)

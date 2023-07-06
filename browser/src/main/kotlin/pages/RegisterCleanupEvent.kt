@@ -4,7 +4,6 @@ import components.OverviewProps
 import components.RoutePage
 import css.Classes
 import emotion.react.css
-import io.kvision.MapsModule
 import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.events.LeafletMouseEvent
 import io.kvision.maps.externals.leaflet.geo.LatLng
@@ -22,10 +21,10 @@ import react.dom.html.ReactHTML
 import utils.Requests
 import utils.getMonthString
 import web.cssom.px
+import web.dom.document
 import web.file.FileReader
 import web.html.ButtonType
 import web.html.InputType
-import web.dom.document
 import kotlinx.browser.document as ktxDocument
 
 private val RegisterForm = FC<Props> {
@@ -194,7 +193,7 @@ private val RegisterForm = FC<Props> {
                 "/data/cleanupEvent",
                 image,
                 CleanUpEventCreationDTO(
-                    1,
+                    1, //cleanupDay.id, // TODP
                     firstName,
                     lastName,
                     emailAddress,
@@ -214,8 +213,6 @@ private val RegisterForm = FC<Props> {
     }
 
     useEffectOnce {
-        MapsModule.initialize()
-
         hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
             val map = LeafletObjectFactory.map(ktxDocument.getElementById("map-holder")!! as HTMLElement) {
                 center = LatLng(47, 11) // TODO center a bit better
@@ -258,7 +255,7 @@ object RegisterCleanupEvent : RoutePage {
             ReactHTML.div {
                 css(Classes.limitedWidth)
 
-                ReactHTML.h3 {
+                ReactHTML.h1 {
                     +"Cleanup anmelden"
                 }
 
@@ -271,11 +268,10 @@ object RegisterCleanupEvent : RoutePage {
 
                     RegisterForm { }
                 } ?: run {
-                    ReactHTML.div {
+                    ReactHTML.p {
                         +"Wir freuen uns sehr, dass du als Organisator:in beim nächsten World Cleanup Day dabei sein möchtest!"
                     }
-                    ReactHTML.br {}
-                    ReactHTML.div {
+                    ReactHTML.p {
                         +"Leider ist dieser noch nicht festgelegt worden!"
                     }
                 }

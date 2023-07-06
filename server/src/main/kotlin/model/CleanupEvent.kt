@@ -5,6 +5,7 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 
@@ -50,14 +51,21 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
                 approved = false
             }
         }
-        fun getAll(): List<CleanupEventDao> = transaction {
-            all().toList()
+        fun getAllByCleanupDayId(cleanupDayId: Int): List<CleanupEventDao> = transaction {
+            find {
+                CleanupEvent.cleanupDayId.eq(cleanupDayId)
+            }.toList()
         }
-
-        fun approve(id: Int?, event: CleanUpEventCreationDTO) = transaction {
+        fun getById(id: Int): CleanupEventDao? = transaction {
+            findById(id)
+        }
+        fun approve(id: Int) = transaction {
             CleanupEvent.update({ CleanupEvent.id.eq(id) }) {
                 it[approved] = true
             }
+        }
+        fun delete(id: Int) = transaction {
+            CleanupEvent.deleteWhere { this.id.eq(id) }
         }
     }
 
