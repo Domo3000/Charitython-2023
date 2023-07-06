@@ -5,7 +5,6 @@ import react.FC
 import react.Props
 import react.dom.events.MouseEventHandler
 import react.dom.html.ReactHTML
-import utils.Style
 import web.cssom.*
 import web.html.HTMLButtonElement
 
@@ -30,8 +29,8 @@ val HeaderButton = FC<HeaderButtonProps> { props ->
             float = Float.right
             background = props.color
             if (props.disabled) {
-                background = Color(Style.greyColor)
-                textDecoration = TextDecoration.lineThrough
+                opacity = number(0.8)
+                textDecoration = TextDecoration.underline
             }
         }
         disabled = props.disabled

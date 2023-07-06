@@ -41,6 +41,19 @@ fun Application.installRouting() = routing {
                 call.respond("Authenticated!")
             }
             route("/data") {
+
+                post("/approveEvent/{id}") {
+                    val eventId = call.parameters["id"]!!.toInt()
+                    CleanupEventDao.approve(eventId)
+                    call.respond(HttpStatusCode.OK)
+                }
+
+                delete("/deleteEvent/{id}") {
+                    val eventId = call.parameters["id"]!!.toInt()
+                    CleanupEventDao.delete(eventId)
+                    call.respond(HttpStatusCode.OK)
+                }
+
                 post("/cleanupDay") {
                     // TODO: for normal requests use something like the following 3 lines
                     //val new = call.receive<CreateCleanupDay>().timestamp.toLocalDateTime()
@@ -103,8 +116,9 @@ fun Application.installRouting() = routing {
                 call.respond(HttpStatusCode.NotFound, "Did not find event for id $eventId")
             }
         }
-        get("/cleanupEvents") {
-            val events = CleanupEventDao.getAll().map { it.toDTO() }
+        get("/cleanupEvents/{cleanupDayId}") {
+            val cleanupDayId = Integer.parseInt(call.parameters["cleanupDayId"])
+            val events = CleanupEventDao.getAllByCleanupDayId(cleanupDayId).map { it.toDTO() }
             call.respondMessage(CleanUpEvents(events))
         }
         post("/cleanupEvent") {

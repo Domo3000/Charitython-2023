@@ -15,19 +15,24 @@ import react.*
 import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
 import utils.Requests
+import web.cssom.Display
+import web.cssom.FlexDirection
 import web.cssom.px
 import web.dom.document
 import kotlinx.browser.document as ktxDocument
 
-object SignUpPage : RoutePage {
-    override val route: String = "signUp" // TODO
+object FindCleanup : RoutePage {
+    override val route: String = "cleanupFinden" // TODO
     override val component: FC<OverviewProps>
         get() = FC { props ->
             val (events, setEvents) = useState<List<CleanUpEventDTO>>(emptyList())
 
             ReactHTML.div {
                 css(Classes.limitedWidth)
-                +"TODO"
+
+                ReactHTML.h1 {
+                    +"Cleanup finden"
+                }
 
                 if (events.isNotEmpty()) {
                     ReactHTML.div {
@@ -37,7 +42,40 @@ object SignUpPage : RoutePage {
                         id = "map-holder"
                     }
                 } else {
-                    +"TODO some message that no events are set"
+                    ReactHTML.p {
+                        +"Es wurden leider noch keine Cleanup Events für den nächsten Cleanup Day erstellt!"
+                    }
+                }
+            }
+
+
+            ReactHTML.div {
+                css(Classes.limitedWidth)
+
+                ReactHTML.div {
+                    css {
+                        marginTop = 50.px
+                        display = Display.flex
+
+                    }
+
+                    events.forEach { event ->
+                        ReactHTML.div {
+
+                            css {
+                                display = Display.flex
+                                flexDirection = FlexDirection.column
+                                padding = 20.px
+//                                height = 300.px
+//                                width = 150.px
+//                                background = Color("black")
+                            }
+
+                            ReactHTML.img {
+                                src = "/files/${event.fileName}"
+                            }
+                        }
+                    }
                 }
             }
 
@@ -48,6 +86,7 @@ object SignUpPage : RoutePage {
                             center = LatLng(47, 11) // TODO center a bit better
                             zoom = 7
                             preferCanvas = true
+
                         }
 
                         val layer = LeafletObjectFactory.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png") {
@@ -77,8 +116,10 @@ object SignUpPage : RoutePage {
             }
 
             useEffectOnce {
-                Requests.getMessage("/data/cleanupEvents") {
-                    setEvents((it as CleanUpEvents).events)
+                props.cleanupDay?.let { cleanupDay ->
+                    Requests.getMessage("/data/cleanupEvents/${cleanupDay.id}") { message ->
+                        setEvents((message as CleanUpEvents).events.filter { it.approved })
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 import components.overview
 import pages.*
+import pages.admin.AdminPage
 import react.FC
 import react.Props
 import react.createElement
@@ -14,7 +15,7 @@ val Routing = FC<Props> {
         ImpressumPage,
         RegisterCleanupEvent,
         ShareResultsPage,
-        SignUpPage
+        FindCleanup
     )
 
     BrowserRouter {

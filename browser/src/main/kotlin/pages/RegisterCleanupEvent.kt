@@ -193,7 +193,7 @@ private val RegisterForm = FC<Props> {
                 "/data/cleanupEvent",
                 image,
                 CleanUpEventCreationDTO(
-                    1,
+                    1, //cleanupDay.id, // TODP
                     firstName,
                     lastName,
                     emailAddress,
@@ -255,7 +255,7 @@ object RegisterCleanupEvent : RoutePage {
             ReactHTML.div {
                 css(Classes.limitedWidth)
 
-                ReactHTML.h3 {
+                ReactHTML.h1 {
                     +"Cleanup anmelden"
                 }
 
@@ -268,11 +268,10 @@ object RegisterCleanupEvent : RoutePage {
 
                     RegisterForm { }
                 } ?: run {
-                    ReactHTML.div {
+                    ReactHTML.p {
                         +"Wir freuen uns sehr, dass du als Organisator:in beim nächsten World Cleanup Day dabei sein möchtest!"
                     }
-                    ReactHTML.br {}
-                    ReactHTML.div {
+                    ReactHTML.p {
                         +"Leider ist dieser noch nicht festgelegt worden!"
                     }
                 }
