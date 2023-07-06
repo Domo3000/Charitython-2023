@@ -1,8 +1,10 @@
 package pages
 
+import components.OverviewPage
 import components.OverviewProps
 import components.RoutePage
 import css.Classes
+import css.Style
 import emotion.react.css
 import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.geo.LatLng
@@ -10,19 +12,89 @@ import io.kvision.maps.externals.leaflet.geometry.Point
 import io.kvision.react.reactWrapper
 import model.CleanUpEventDTO
 import model.CleanUpEvents
-import org.w3c.dom.HTMLElement
 import react.*
 import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
+import utils.MapUtils
 import utils.Requests
-import web.cssom.Display
-import web.cssom.FlexDirection
+import web.cssom.ClassName
+import web.cssom.Float
+import web.cssom.pct
 import web.cssom.px
 import web.dom.document
-import kotlinx.browser.document as ktxDocument
+
+private external interface EventProps : Props {
+    var cleanUpEvent: CleanUpEventDTO
+    var stateSetter: (String, OverviewPage) -> Unit
+}
+
+private val CleanupDetails = FC<EventProps> { props ->
+    val cleanUpEvent = props.cleanUpEvent
+
+    ReactHTML.div {
+        css {
+            width = 25.pct
+            border = Style.border
+            float = Float.left
+        }
+
+        ReactHTML.img {
+            src = cleanUpEvent.fileName.let { fileName -> "/files/$fileName" }
+            css {
+                width = 100.pct
+                borderBottom = Style.border
+            }
+            onClick = {
+                props.stateSetter("/details/${cleanUpEvent.id}", DetailsPage(cleanUpEvent.id))
+            }
+        }
+
+        ReactHTML.div {
+            css {
+                padding = 10.px
+            }
+
+            ReactHTML.h1 {
+                +cleanUpEvent.eventName
+            }
+
+            // TODO wrap in Table
+            IconText {
+                icon = "clock"
+                text = "${cleanUpEvent.startTime} Uhr - ${cleanUpEvent.endTime} Uhr"
+            }
+
+            ReactHTML.br {}
+
+            IconText {
+                icon = "person"
+                text = cleanUpEvent.organization
+            }
+
+            ReactHTML.br {}
+
+            ReactHTML.div {
+                ReactHTML.i {
+                    className = ClassName("fa-solid fa-link")
+                }
+                ReactHTML.a {
+                    css {
+                        paddingLeft = 15.px
+                    }
+                    +cleanUpEvent.websiteAddress
+                    href = cleanUpEvent.websiteAddress
+                }
+            }
+
+            ReactHTML.p {
+                +cleanUpEvent.description
+            }
+        }
+    }
+}
 
 object FindCleanup : RoutePage {
-    override val route: String = "cleanupFinden" // TODO
+    override val route: String = "cleanupFinden" // TODO use everywhere same style for routes
     override val component: FC<OverviewProps>
         get() = FC { props ->
             val (events, setEvents) = useState<List<CleanUpEventDTO>>(emptyList())
@@ -46,33 +118,18 @@ object FindCleanup : RoutePage {
                         +"Es wurden leider noch keine Cleanup Events für den nächsten Cleanup Day erstellt!"
                     }
                 }
-            }
-
-
-            ReactHTML.div {
-                css(Classes.limitedWidth)
 
                 ReactHTML.div {
-                    css {
-                        marginTop = 50.px
-                        display = Display.flex
 
-                    }
+                    ReactHTML.div {
+                        css {
+                            marginTop = 50.px
+                        }
 
-                    events.forEach { event ->
-                        ReactHTML.div {
-
-                            css {
-                                display = Display.flex
-                                flexDirection = FlexDirection.column
-                                padding = 20.px
-//                                height = 300.px
-//                                width = 150.px
-//                                background = Color("black")
-                            }
-
-                            ReactHTML.img {
-                                src = "/files/${event.fileName}"
+                        events.forEach { event ->
+                            CleanupDetails {
+                                cleanUpEvent = event
+                                stateSetter = props.stateSetter
                             }
                         }
                     }
@@ -82,19 +139,7 @@ object FindCleanup : RoutePage {
             useEffect(events) {
                 if (events.isNotEmpty()) {
                     hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
-                        val map = LeafletObjectFactory.map(ktxDocument.getElementById("map-holder")!! as HTMLElement) {
-                            center = LatLng(47, 11) // TODO center a bit better
-                            zoom = 7
-                            preferCanvas = true
-
-                        }
-
-                        val layer = LeafletObjectFactory.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png") {
-                            attribution =
-                                "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
-                        }
-
-                        layer.addTo(map)
+                        val map = MapUtils.map()
 
                         events.forEach { event ->
                             val marker = LeafletObjectFactory.marker(LatLng(event.latitude, event.longitude)) {
@@ -124,3 +169,4 @@ object FindCleanup : RoutePage {
             }
         }
 }
+

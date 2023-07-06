@@ -20,6 +20,15 @@ data class CreateCleanupDay(val timestamp: Instant) : Message()
 data class CleanupDayDTO(val id: Int, val timestamp: Instant, val fileName: String) : Message()
 
 @Serializable
+data class CleanupDayResultsDTO(
+    val id: Int,
+    val cleanupDayId: Int,
+    val timestamp: Instant,
+    val garbage: Double,
+    val participants: Int
+) : Message()
+
+@Serializable
 object DeletedCleanupDay : Message()
 
 @Serializable

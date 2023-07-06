@@ -11,17 +11,31 @@ import io.kvision.maps.externals.leaflet.geometry.Point
 import io.kvision.react.reactWrapper
 import kotlinx.datetime.toJSDate
 import model.CleanUpEventDTO
-import org.w3c.dom.HTMLElement
 import react.*
 import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
 import react.router.useParams
+import utils.MapUtils
 import utils.Requests
-import utils.Style
 import web.cssom.*
 
-private object DetailsStyle {
-    val border = Border(4.px, LineStyle.solid, Color(Style.blueColor))
+external interface IconTextProps : Props {
+    var icon: String
+    var text: String
+}
+
+val IconText = FC<IconTextProps> { props ->
+    ReactHTML.div {
+        ReactHTML.i {
+            className = ClassName("fa-solid fa-${props.icon}")
+        }
+        ReactHTML.span {
+            css {
+                paddingLeft = 15.px
+            }
+            +props.text
+        }
+    }
 }
 
 private external interface CleanUpEventProps : Props {
@@ -51,28 +65,42 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
                     +"WANN"
                 }
 
-                ReactHTML.p {
-                    +props.cleanupDayDate
+                IconText {
+                    icon = "calendar-days"
+                    text = props.cleanupDayDate
                 }
 
-                ReactHTML.p {
-                    +"${cleanUpEvent.startTime} Uhr - ${cleanUpEvent.endTime} Uhr"
+                ReactHTML.br {}
+
+                IconText {
+                    icon = "clock"
+                    text = "${cleanUpEvent.startTime} Uhr - ${cleanUpEvent.endTime} Uhr"
                 }
             }
 
             ReactHTML.div {
-
                 ReactHTML.h2 {
                     +"VERANSTALTER:INNEN"
                 }
 
-                ReactHTML.p {
-                    +cleanUpEvent.organization
+                IconText {
+                    icon = "person"
+                    text = cleanUpEvent.organization
                 }
 
-                ReactHTML.a {
-                    +cleanUpEvent.websiteAddress
-                    href = cleanUpEvent.websiteAddress
+                ReactHTML.br {}
+
+                ReactHTML.div {
+                    ReactHTML.i {
+                        className = ClassName("fa-solid fa-link")
+                    }
+                    ReactHTML.a {
+                        css {
+                            paddingLeft = 15.px
+                        }
+                        +cleanUpEvent.websiteAddress
+                        href = cleanUpEvent.websiteAddress
+                    }
                 }
             }
 
@@ -80,7 +108,7 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
                 src = cleanUpEvent.fileName.let { fileName -> "/files/$fileName" }
                 css {
                     width = 300.px
-                    borderLeft = DetailsStyle.border
+                    borderLeft = css.Style.border
                 }
             }
         }
@@ -101,19 +129,11 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
             val coordinates = LatLng(cleanUpEvent.latitude, cleanUpEvent.longitude)
 
             hydrateRoot(web.dom.document.getElementById("desktop-map-holder")!!, reactWrapper<FC<Props>> {
-                val map =
-                    LeafletObjectFactory.map(kotlinx.browser.document.getElementById("desktop-map-holder")!! as HTMLElement) {
-                        center = coordinates
-                        zoom = 11
-                        preferCanvas = false
-                    }
-
-                val layer = LeafletObjectFactory.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png") {
-                    attribution =
-                        "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
-                }
-
-                layer.addTo(map)
+                val map = MapUtils.map(
+                    id = "desktop-map-holder",
+                    center = coordinates,
+                    zoom = 11
+                )
 
                 val marker =
                     LeafletObjectFactory.marker(coordinates) {
@@ -141,7 +161,7 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
             src = cleanUpEvent.fileName.let { fileName -> "/files/$fileName" }
             css {
                 width = 100.pct
-                borderBottom = DetailsStyle.border
+                borderBottom = css.Style.border
             }
         }
 
@@ -149,21 +169,39 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
             +cleanUpEvent.eventName
         }
 
-        ReactHTML.p {
-            +props.cleanupDayDate
+        // TODO Table
+        IconText {
+            icon = "calendar-days"
+            text = props.cleanupDayDate
         }
 
-        ReactHTML.p {
-            +"${cleanUpEvent.startTime} Uhr - ${cleanUpEvent.endTime} Uhr"
+        ReactHTML.br {}
+
+        IconText {
+            icon = "clock"
+            text = "${cleanUpEvent.startTime} Uhr - ${cleanUpEvent.endTime} Uhr"
         }
 
-        ReactHTML.p {
-            +cleanUpEvent.organization
+        ReactHTML.br {}
+
+        IconText {
+            icon = "person"
+            text = cleanUpEvent.organization
         }
 
-        ReactHTML.a {
-            +cleanUpEvent.websiteAddress
-            href = cleanUpEvent.websiteAddress
+        ReactHTML.br {}
+
+        ReactHTML.div {
+            ReactHTML.i {
+                className = ClassName("fa-solid fa-link")
+            }
+            ReactHTML.a {
+                css {
+                    paddingLeft = 15.px
+                }
+                +cleanUpEvent.websiteAddress
+                href = cleanUpEvent.websiteAddress
+            }
         }
 
         ReactHTML.div {
@@ -182,19 +220,11 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
             val coordinates = LatLng(cleanUpEvent.latitude, cleanUpEvent.longitude)
 
             hydrateRoot(web.dom.document.getElementById("mobile-map-holder")!!, reactWrapper<FC<Props>> {
-                val map =
-                    LeafletObjectFactory.map(kotlinx.browser.document.getElementById("mobile-map-holder")!! as HTMLElement) {
-                        center = coordinates
-                        zoom = 11
-                        preferCanvas = false
-                    }
-
-                val layer = LeafletObjectFactory.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png") {
-                    attribution =
-                        "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
-                }
-
-                layer.addTo(map)
+                val map = MapUtils.map(
+                    id = "mobile-map-holder",
+                    center = coordinates,
+                    zoom = 11
+                )
 
                 val marker =
                     LeafletObjectFactory.marker(coordinates) {

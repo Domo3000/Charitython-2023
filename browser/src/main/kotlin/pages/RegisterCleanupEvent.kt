@@ -1,5 +1,6 @@
 package pages
 
+import components.OverviewPage
 import components.OverviewProps
 import components.RoutePage
 import css.Classes
@@ -14,10 +15,12 @@ import js.buffer.ArrayBuffer
 import js.typedarrays.Int8Array
 import kotlinx.datetime.toJSDate
 import model.CleanUpEventCreationDTO
-import org.w3c.dom.HTMLElement
+import model.CleanupDayDTO
+import pages.index.IndexPage
 import react.*
 import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
+import utils.MapUtils
 import utils.Requests
 import utils.getMonthString
 import web.cssom.px
@@ -25,9 +28,39 @@ import web.dom.document
 import web.file.FileReader
 import web.html.ButtonType
 import web.html.InputType
-import kotlinx.browser.document as ktxDocument
+import web.prompts.alert
 
-private val RegisterForm = FC<Props> {
+private external interface InputProps : Props {
+    var label: String
+    var setter: StateSetter<String>
+    var type: InputType?
+    var optional: Boolean?
+}
+
+private val Input = FC<InputProps> { props ->
+    ReactHTML.tr {
+        ReactHTML.td {
+            +"${props.label}:"
+        }
+        ReactHTML.td {
+            ReactHTML.input {
+                type = props.type ?: InputType.text
+                required = props.optional?.let { !it } ?: true
+                onChange = {
+                    props.setter(it.target.value)
+                }
+            }
+        }
+    }
+}
+
+private external interface RegisterFormProps : Props {
+    var cleanupDay: CleanupDayDTO
+    var stateSetter: (String, OverviewPage) -> Unit
+}
+
+private val RegisterForm = FC<RegisterFormProps> { props ->
+    val cleanupDay = props.cleanupDay
     val (firstName, setFirstName) = useState("")
     val (lastName, setLastName) = useState("")
     val (emailAddress, setEmailAddress) = useState("")
@@ -42,129 +75,73 @@ private val RegisterForm = FC<Props> {
     val (imageInput, setImageInput) = useState<ArrayBuffer?>(null)
     val (coordinates, setCoordinates) = useState<LatLng?>(null)
 
-    ReactHTML.h1 {
-        +"TODO" // TODO finish this -> make it Deutsch and more beautiful
+    ReactHTML.h2 {
+        val date = cleanupDay.timestamp.toJSDate()
+
+        +"Wir freuen uns sehr, dass du als Organisator:in beim World Cleanup Day am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} dabei sein möchtest! Bitte füll das folgende Formular aus."
     }
 
     ReactHTML.form {
-        ReactHTML.div {
-            +"firstname: "
-            ReactHTML.input {
-                type = InputType.text
-                onChange = {
-                    setFirstName(it.target.value)
-                }
+        ReactHTML.table {
+            Input {
+                label = "Vorname"
+                setter = setFirstName
             }
-        }
-        ReactHTML.div {
-            +"lastName: "
-            ReactHTML.input {
-                type = InputType.text
-                onChange = {
-                    setLastName(it.target.value)
-                }
+            Input {
+                label = "Nachname"
+                setter = setLastName
             }
-        }
-        ReactHTML.div {
-            +"email: "
-            ReactHTML.input {
+            Input {
+                label = "Email"
+                setter = setEmailAddress
                 type = InputType.email
-                onChange = {
-                    setEmailAddress(it.target.value)
-                }
             }
-        }
-        ReactHTML.div {
-            +"organization: "
-            ReactHTML.input {
-                type = InputType.text
-                onChange = {
-                    setOrganization(it.target.value)
-                }
+            Input {
+                label = "Organisation"
+                setter = setOrganization
             }
-        }
-        ReactHTML.div {
-            +"websiteAddress: "
-            ReactHTML.input {
-                type = InputType.text
-                onChange = {
-                    setWebsiteAddress(it.target.value)
-                }
+            Input {
+                label = "Webseite"
+                setter = setWebsiteAddress
+                optional = true
+                type = InputType.url
             }
-        }
-        ReactHTML.div {
-            +"eventName: "
-            ReactHTML.input {
-                type = InputType.text
-                onChange = {
-                    setEventName(it.target.value)
-                }
+            Input {
+                label = "Event Name"
+                setter = setEventName
             }
-        }
-        /*
-        ReactHTML.div {
-            +"street: "
-            ReactHTML.input {
-                type = InputType.text
-                onChange = {
-                    setStreet(it.target.value)
-                }
-            }
-        }
-        ReactHTML.div {
-            +"zipCode: "
-            ReactHTML.input {
-                type = InputType.text
-                onChange = {
-                    setZipCode(it.target.value)
-                }
-            }
-        }
-
-         */
-        ReactHTML.div {
-            +"startTime: "
-            ReactHTML.input {
+            Input {
+                label = "Beginn"
+                setter = setStartTime
                 type = InputType.time
-                onChange = {
-                    setStartTime(it.target.value)
-                    console.log(it.target.value)
-                }
             }
-        }
-        ReactHTML.div {
-            +"endTime: "
-            ReactHTML.input {
+            Input {
+                label = "Ende"
+                setter = setEndTime
                 type = InputType.time
-                onChange = {
-                    setEndTime(it.target.value)
-                    console.log(it.target.value)
-                }
             }
-        }
-        ReactHTML.div {
-            +"description: "
-            ReactHTML.input {
-                type = InputType.text
-                onChange = {
-                    setDescription(it.target.value)
-                }
+            Input {
+                label = "Veranstaltungstext"
+                setter = setDescription
             }
-        }
 
-        // TODO for file input see Admin Page in /browser and post("/cleanupDay") route in /server
-        ReactHTML.div {
-            +"file: "
-            ReactHTML.input {
-                type = InputType.file
-                required = true
-                onChange = {
-                    val fileReader = FileReader()
+            ReactHTML.tr {
+                ReactHTML.td {
+                    +"Bild:"
+                }
+                ReactHTML.td {
+                    ReactHTML.input {
+                        type = InputType.file
+                        required = true
+                        onChange = {
+                            val fileReader = FileReader()
 
-                    fileReader.readAsArrayBuffer(it.target.files!![0])
+                            fileReader.readAsArrayBuffer(it.target.files!![0])
 
-                    fileReader.onload = { e ->
-                        setImageInput(e.target!!.result as ArrayBuffer)
+                            fileReader.onload = { e ->
+                                setImageInput(e.target!!.result as ArrayBuffer)
+                            }
+                        }
                     }
                 }
             }
@@ -179,52 +156,51 @@ private val RegisterForm = FC<Props> {
         }
 
         ReactHTML.button {
-            +"Submit"
+            css {
+                marginTop = 20.px
+            }
+            +"Abschicken"
             type = ButtonType.submit
         }
 
         onSubmit = {
             it.preventDefault()
 
-            @Suppress("CAST_NEVER_SUCCEEDS") // it evidently does succeed
-            val image = imageInput!!.run { Int8Array(this) as ByteArray }
+            imageInput?.let { input ->
+                @Suppress("CAST_NEVER_SUCCEEDS") // it evidently does succeed
+                val image = input.run { Int8Array(this) as ByteArray }
 
-            Requests.postImage(
-                "/data/cleanupEvent",
-                image,
-                CleanUpEventCreationDTO(
-                    1, //cleanupDay.id, // TODP
-                    firstName,
-                    lastName,
-                    emailAddress,
-                    organization,
-                    websiteAddress,
-                    eventName,
-                    coordinates!!.lat.toDouble(),
-                    coordinates.lng.toDouble(),
-                    startTime,
-                    endTime,
-                    description
-                )
-            ) { maybeMessage ->
-                // TODO some success message
+                Requests.postImage(
+                    "/data/cleanupEvent",
+                    image,
+                    CleanUpEventCreationDTO(
+                        cleanupDay.id,
+                        firstName,
+                        lastName,
+                        emailAddress,
+                        organization,
+                        websiteAddress,
+                        eventName,
+                        coordinates!!.lat.toDouble(),
+                        coordinates.lng.toDouble(),
+                        startTime,
+                        endTime,
+                        description
+                    )
+                ) {
+                    props.stateSetter("/", IndexPage) // TODO better reload
+                    alert("Event wurde zur Bestätigung übermittelt!")
+                    props.stateSetter("/${RegisterCleanupEvent.route}", RegisterCleanupEvent)
+                }
+            } ?: run {
+                alert("Click auf die Karte um einen Ort festzulegen!")
             }
         }
     }
 
     useEffectOnce {
         hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
-            val map = LeafletObjectFactory.map(ktxDocument.getElementById("map-holder")!! as HTMLElement) {
-                center = LatLng(47, 11) // TODO center a bit better
-                zoom = 7
-                preferCanvas = true
-            }
-
-            val layer = LeafletObjectFactory.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png") {
-                attribution =
-                    "&copy; <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors"
-            }
-            layer.addTo(map)
+            val map = MapUtils.map()
 
             var marker: Marker? = null
 
@@ -260,13 +236,10 @@ object RegisterCleanupEvent : RoutePage {
                 }
 
                 props.cleanupDay?.let { cleanupDay ->
-                    ReactHTML.div {
-                        val date = cleanupDay.timestamp.toJSDate()
-
-                        +"Wir freuen uns sehr, dass du als Organisator:in beim World Cleanup Day am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} dabei sein möchtest! Bitte füll das folgende Formular aus."
+                    RegisterForm {
+                        this.cleanupDay = cleanupDay
+                        this.stateSetter = props.stateSetter
                     }
-
-                    RegisterForm { }
                 } ?: run {
                     ReactHTML.p {
                         +"Wir freuen uns sehr, dass du als Organisator:in beim nächsten World Cleanup Day dabei sein möchtest!"

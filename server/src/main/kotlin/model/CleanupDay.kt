@@ -33,6 +33,13 @@ class CleanupDayDao(id: EntityID<Int>) : IntEntity(id) {
                 )
             }.orderBy(CleanupDay.date to SortOrder.ASC).firstOrNull()
         }
+        fun getLast() = transaction {
+            find {
+                CleanupDay.date.less(
+                    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                )
+            }.orderBy(CleanupDay.date to SortOrder.DESC).firstOrNull()
+        }
         fun deleteById(id: Int) = transaction {
             CleanupDay.deleteWhere { CleanupDay.id eq id } // TODO cascade
         }

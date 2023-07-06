@@ -3,7 +3,7 @@ package utils
 import model.Admin
 import model.CleanupDay
 import model.CleanupEvent
-import model.FinishedCleanupDay
+import model.CleanupDayResults
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -20,7 +20,7 @@ class Connection(url: String, user: String, password: String) {
             SchemaUtils.create(Admin)
             SchemaUtils.create(CleanupDay)
             SchemaUtils.create(CleanupEvent)
-            SchemaUtils.create(FinishedCleanupDay)
+            SchemaUtils.create(CleanupDayResults)
         }
     }
 }

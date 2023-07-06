@@ -13,6 +13,9 @@ fun HTML.index() {
             rel = "stylesheet"
             href = "/static/styles.css"
         }
+        script {
+            src = "https://kit.fontawesome.com/4110b65d96.js"
+        }
     }
     body {
         div {

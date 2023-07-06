@@ -8,10 +8,18 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import kotlinx.coroutines.coroutineScope
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Month
 import kotlinx.serialization.json.Json
 import model.AdminDao
+import model.CleanupDayDao
+import model.CleanupDayResultsDao
 import org.slf4j.LoggerFactory
-import utils.*
+import routing.BASIC_AUTH
+import routing.installRouting
+import utils.Connection
+import utils.logError
+import utils.logInfo
 import java.io.File
 import java.security.KeyStore
 import kotlin.random.Random
@@ -46,6 +54,16 @@ private fun Application.body(debug: Boolean) {
 
         AdminDao.insert(password)
         logInfo("generated new password: $password")
+
+        CleanupDayDao.getLast() ?: run {
+            logInfo("inserting default values")
+            val previousCleanupDay = CleanupDayDao.insert(
+                LocalDateTime(2022, Month.SEPTEMBER, 17, 0, 0, 0),
+                "unused"
+            )
+
+            CleanupDayResultsDao.insert(previousCleanupDay.id.value, 27.0, 14000)
+        }
 
         authentication {
             basic(BASIC_AUTH) {

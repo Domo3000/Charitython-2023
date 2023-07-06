@@ -3,6 +3,7 @@ package components
 import css.ClassNames
 import emotion.react.css
 import pages.*
+import pages.index.IndexPage
 import react.FC
 import react.Props
 import react.dom.html.ReactHTML

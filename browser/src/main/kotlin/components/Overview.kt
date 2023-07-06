@@ -3,7 +3,7 @@ package components
 import emotion.react.css
 import io.kvision.MapsModule
 import model.CleanupDayDTO
-import pages.IndexPage
+import pages.index.IndexPage
 import react.*
 import react.dom.html.ReactHTML
 import utils.Requests
