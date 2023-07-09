@@ -34,7 +34,7 @@ object IndexPage : OverviewPage {
                     display = Display.flex
                     flexDirection = FlexDirection.column
                     justifyContent = JustifyContent.spaceEvenly
-                    backgroundImage = url("/static/landing-background-1.jpeg")
+                    backgroundImage = url("/static/background.jpg")
                     backgroundRepeat = BackgroundRepeat.noRepeat
                     backgroundSize = BackgroundSize.cover
                     backgroundAttachment = BackgroundAttachment.fixed

@@ -33,6 +33,7 @@ suspend fun ApplicationCall.respondMessage(message: Message?) {
 fun Application.installRouting() = routing {
     adminRoute()
     publicRoute()
+    geocodingRoute()
 
     get("/health") {
         call.respondText("Healthy!")

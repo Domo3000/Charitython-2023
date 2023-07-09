@@ -5,6 +5,7 @@ import web.cssom.ClassName
 object ClassNames {
     val mobileElement = ClassName("phone-element")
     val desktopElement = ClassName("desktop-element")
+    val phoneFullWidth = ClassName("phone-full-width")
 }
 
 infix fun ClassName.and(s: String) = ClassName("${this.unsafeCast<String>()} $s")

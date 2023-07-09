@@ -3,31 +3,39 @@ package pages
 import components.OverviewPage
 import components.OverviewProps
 import components.RoutePage
+import css.ClassNames
 import css.Classes
 import emotion.react.css
+import io.ktor.client.statement.*
 import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.events.LeafletMouseEvent
 import io.kvision.maps.externals.leaflet.geo.LatLng
 import io.kvision.maps.externals.leaflet.geometry.Point
 import io.kvision.maps.externals.leaflet.layer.marker.Marker
+import io.kvision.maps.externals.leaflet.map.LeafletMap
 import io.kvision.react.reactWrapper
 import js.buffer.ArrayBuffer
 import js.typedarrays.Int8Array
+import kotlinx.browser.window
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import kotlinx.datetime.toJSDate
 import model.CleanUpEventCreationDTO
 import model.CleanupDayDTO
-import pages.index.IndexPage
+import model.Location
+import model.Messages
 import react.*
 import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
 import utils.MapUtils
 import utils.Requests
 import utils.getMonthString
-import web.cssom.px
+import web.cssom.*
 import web.dom.document
 import web.file.FileReader
 import web.html.ButtonType
 import web.html.InputType
+import web.location.location
 import web.prompts.alert
 
 private external interface InputProps : Props {
@@ -35,6 +43,7 @@ private external interface InputProps : Props {
     var setter: StateSetter<String>
     var type: InputType?
     var optional: Boolean?
+    var error: Boolean
 }
 
 private val Input = FC<InputProps> { props ->
@@ -44,6 +53,11 @@ private val Input = FC<InputProps> { props ->
         }
         ReactHTML.td {
             ReactHTML.input {
+                if (props.error) {
+                    css {
+                        background = Color("#FFAA99")
+                    }
+                }
                 type = props.type ?: InputType.text
                 required = props.optional?.let { !it } ?: true
                 onChange = {
@@ -59,6 +73,38 @@ private external interface RegisterFormProps : Props {
     var stateSetter: (String, OverviewPage) -> Unit
 }
 
+private object RequestHelper {
+    val scope = MainScope()
+
+    fun getWithTimeout(
+        url: String,
+        setAddressError: StateSetter<Boolean>,
+        setTimeout: StateSetter<Int?>,
+        callback: (Location) -> Unit
+    ) {
+        Requests.get(url) { response ->
+            when (response.status.value) {
+                200 -> scope.launch {
+                    val location = Messages.decode(response.bodyAsText()) as Location
+                    callback(location)
+                    setAddressError(false)
+                }
+
+                429 -> setTimeout(window.setTimeout({
+                    getWithTimeout(url, setAddressError, setTimeout, callback)
+                }, 1000))
+
+                else -> {
+                    setAddressError(true)
+                }
+            }
+        }
+    }
+}
+
+class MapHolder(var map: LeafletMap?)
+class MarkerHolder(var marker: Marker?)
+
 private val RegisterForm = FC<RegisterFormProps> { props ->
     val cleanupDay = props.cleanupDay
     val (firstName, setFirstName) = useState("")
@@ -67,13 +113,19 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
     val (organization, setOrganization) = useState("")
     val (websiteAddress, setWebsiteAddress) = useState("")
     val (eventName, setEventName) = useState("")
-    //val (street, setStreet) = useState("") // TODO require either address or coordinates?
-    //val (zipCode, setZipCode) = useState("")
+    val (street, setStreet) = useState("")
+    val (zipCode, setZipCode) = useState("")
     val (description, setDescription) = useState("")
     val (startTime, setStartTime) = useState("")
     val (endTime, setEndTime) = useState("")
     val (imageInput, setImageInput) = useState<ArrayBuffer?>(null)
     val (coordinates, setCoordinates) = useState<LatLng?>(null)
+
+    val (addressError, setAddressError) = useState(false)
+    val (timeout, setTimeout) = useState<Int?>(null)
+
+    val (mapHolder, _) = useState(MapHolder(null))
+    val (markerHolder, _) = useState(MarkerHolder(null))
 
     ReactHTML.h2 {
         val date = cleanupDay.timestamp.toJSDate()
@@ -83,6 +135,11 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
 
     ReactHTML.form {
         ReactHTML.table {
+            css(ClassNames.phoneFullWidth) {
+                width = 50.pct
+                float = Float.left
+                tableLayout = TableLayout.fixed
+            }
             Input {
                 label = "Vorname"
                 setter = setFirstName
@@ -110,6 +167,23 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
                 label = "Event Name"
                 setter = setEventName
             }
+        }
+        ReactHTML.table {
+            css(ClassNames.phoneFullWidth) {
+                width = 50.pct
+                float = Float.left
+                tableLayout = TableLayout.fixed
+            }
+            Input {
+                label = "Straße"
+                setter = setStreet
+                error = addressError
+            }
+            Input {
+                label = "PLZ"
+                setter = setZipCode
+                error = addressError
+            }
             Input {
                 label = "Beginn"
                 setter = setStartTime
@@ -119,10 +193,6 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
                 label = "Ende"
                 setter = setEndTime
                 type = InputType.time
-            }
-            Input {
-                label = "Veranstaltungstext"
-                setter = setDescription
             }
 
             ReactHTML.tr {
@@ -147,12 +217,22 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
             }
         }
 
-        ReactHTML.div {
+        MapUtils.mapHolder()()
+
+        ReactHTML.p {
+            +"Veranstaltungstext:"
+        }
+
+        ReactHTML.textarea {
             css {
-                height = 500.px // TODO better
-                maxWidth = 800.px
+                width = 100.pct
             }
-            id = "map-holder"
+            required = true
+            maxLength = 5000
+            rows = 8
+            onChange = {
+                setDescription(it.target.value)
+            }
         }
 
         ReactHTML.button {
@@ -166,34 +246,94 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
         onSubmit = {
             it.preventDefault()
 
-            imageInput?.let { input ->
+            coordinates?.let { c ->
                 @Suppress("CAST_NEVER_SUCCEEDS") // it evidently does succeed
-                val image = input.run { Int8Array(this) as ByteArray }
+                val image = imageInput!!.run { Int8Array(this) as ByteArray }
 
                 Requests.postImage(
                     "/data/cleanupEvent",
                     image,
                     CleanUpEventCreationDTO(
-                        cleanupDay.id,
-                        firstName,
-                        lastName,
-                        emailAddress,
-                        organization,
-                        websiteAddress,
-                        eventName,
-                        coordinates!!.lat.toDouble(),
-                        coordinates.lng.toDouble(),
-                        startTime,
-                        endTime,
-                        description
+                        cleanupDayId = cleanupDay.id,
+                        firstName = firstName,
+                        lastName = lastName,
+                        emailAddress = emailAddress,
+                        organization = organization,
+                        websiteAddress = websiteAddress,
+                        eventName = eventName,
+                        street = street,
+                        zipCode = zipCode,
+                        latitude = c.lat.toDouble(),
+                        longitude = c.lng.toDouble(),
+                        startTime = startTime,
+                        endTime = endTime,
+                        description = description
                     )
                 ) {
-                    props.stateSetter("/", IndexPage) // TODO better reload
                     alert("Event wurde zur Bestätigung übermittelt!")
-                    props.stateSetter("/${RegisterCleanupEvent.route}", RegisterCleanupEvent)
+                    location.reload()
                 }
             } ?: run {
                 alert("Click auf die Karte um einen Ort festzulegen!")
+            }
+        }
+    }
+
+    fun getLocationWithTimeout() {
+        if (timeout != null) {
+            window.clearTimeout(timeout)
+        }
+
+        setTimeout(window.setTimeout({
+            setAddressError(false)
+            setCoordinates(null)
+            RequestHelper.getWithTimeout(
+                "/data/coordinates/$zipCode/$street",
+                setAddressError,
+                setTimeout
+            ) { location ->
+                val latitude = location.latitude.toDouble()
+                val longitude = location.longitude.toDouble()
+                setCoordinates(LatLng(latitude, longitude))
+            }
+        }, 1000))
+    }
+
+    useEffect(street) {
+        if (zipCode.length > 3) {
+            getLocationWithTimeout()
+        }
+    }
+
+    useEffect(zipCode) {
+        if (street.length > 3) {
+            getLocationWithTimeout()
+        }
+    }
+
+    useEffect(coordinates) {
+        mapHolder.map?.let { map ->
+            if (coordinates != null) {
+                markerHolder.marker?.removeFrom(map)
+
+                map.flyTo(coordinates, 15)
+
+                markerHolder.marker = LeafletObjectFactory.marker(coordinates) {
+                    title = "Event"
+                    icon = LeafletObjectFactory.icon {
+                        iconUrl = "/static/logo-oval.png"
+                        iconSize = Point(25, 25, true)
+                    }
+                }
+
+                markerHolder.marker!!.addTo(map)
+                setAddressError(false)
+            } else {
+                markerHolder.marker?.let {
+                    it.removeFrom(map)
+                }
+
+                map.flyTo(MapUtils.center, 7)
             }
         }
     }
@@ -202,24 +342,12 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
         hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
             val map = MapUtils.map()
 
-            var marker: Marker? = null
-
             map.on("click", { event ->
                 val latLng = (event as LeafletMouseEvent).latlng
                 setCoordinates(latLng)
-
-                marker?.removeFrom(map)
-
-                marker = LeafletObjectFactory.marker(latLng) {
-                    title = "Event"
-                    icon = LeafletObjectFactory.icon {
-                        iconUrl = "/static/logo-oval.png"
-                        iconSize = Point(25, 25, true)
-                    }
-                }
-
-                marker!!.addTo(map)
             })
+
+            mapHolder.map = map
         }.create())
     }
 }

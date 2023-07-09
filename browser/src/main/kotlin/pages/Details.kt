@@ -45,6 +45,7 @@ private external interface CleanUpEventProps : Props {
 
 private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
     val cleanUpEvent = props.cleanUpEvent
+    val mapId = "desktop-map-holder"
 
     ReactHTML.div {
         className = ClassNames.desktopElement
@@ -58,6 +59,7 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
                 display = Display.flex
                 flexWrap = FlexWrap.nowrap
                 justifyContent = JustifyContent.spaceBetween
+                marginBottom = 2.rem
             }
 
             ReactHTML.div {
@@ -113,13 +115,7 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
             }
         }
 
-        ReactHTML.div {
-            css {
-                height = 800.px
-                marginTop = 2.rem
-            }
-            id = "desktop-map-holder"
-        }
+        MapUtils.mapHolder(MapUtils.Format.Wide, mapId)()
 
         ReactHTML.p {
             +cleanUpEvent.description
@@ -128,9 +124,9 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
         useEffectOnce {
             val coordinates = LatLng(cleanUpEvent.latitude, cleanUpEvent.longitude)
 
-            hydrateRoot(web.dom.document.getElementById("desktop-map-holder")!!, reactWrapper<FC<Props>> {
+            hydrateRoot(web.dom.document.getElementById(mapId)!!, reactWrapper<FC<Props>> {
                 val map = MapUtils.map(
-                    id = "desktop-map-holder",
+                    id = mapId,
                     center = coordinates,
                     zoom = 11
                 )
@@ -153,6 +149,7 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
 
 private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
     val cleanUpEvent = props.cleanUpEvent
+    val mapId = "mobile-map-holder"
 
     ReactHTML.div {
         className = ClassNames.mobileElement
@@ -192,6 +189,9 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
         ReactHTML.br {}
 
         ReactHTML.div {
+            css {
+                marginBottom = 2.rem
+            }
             ReactHTML.i {
                 className = ClassName("fa-solid fa-link")
             }
@@ -204,13 +204,7 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
             }
         }
 
-        ReactHTML.div {
-            css {
-                paddingTop = 100.pct
-                marginTop = 2.rem
-            }
-            id = "mobile-map-holder"
-        }
+        MapUtils.mapHolder(MapUtils.Format.Wide, mapId)()
 
         ReactHTML.p {
             +cleanUpEvent.description
@@ -219,9 +213,9 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
         useEffectOnce {
             val coordinates = LatLng(cleanUpEvent.latitude, cleanUpEvent.longitude)
 
-            hydrateRoot(web.dom.document.getElementById("mobile-map-holder")!!, reactWrapper<FC<Props>> {
+            hydrateRoot(web.dom.document.getElementById(mapId)!!, reactWrapper<FC<Props>> {
                 val map = MapUtils.map(
-                    id = "mobile-map-holder",
+                    id = mapId,
                     center = coordinates,
                     zoom = 11
                 )
@@ -267,7 +261,7 @@ class DetailsPage(private val maybeEventId: Int?) : OverviewPage {
                         this.cleanUpEvent = it
                     }
                 } ?: run {
-                    if(loading) {
+                    if (loading) {
                         +"lade Daten..."
                     } else {
                         NotFound { }

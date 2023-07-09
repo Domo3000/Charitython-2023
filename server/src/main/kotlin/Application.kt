@@ -5,6 +5,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.ratelimit.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import kotlinx.coroutines.coroutineScope
@@ -23,6 +24,7 @@ import utils.logInfo
 import java.io.File
 import java.security.KeyStore
 import kotlin.random.Random
+import kotlin.time.Duration.Companion.seconds
 
 private fun getSystemCharArray(key: String) = System.getenv(key).toCharArray()
 
@@ -94,6 +96,12 @@ private fun Application.body(debug: Boolean) {
                 ignoreUnknownKeys = true
                 classDiscriminator = "class"
             })
+        }
+
+        install(RateLimit) {
+            register {
+                rateLimiter(1, 1.seconds)
+            }
         }
 
         installRouting()

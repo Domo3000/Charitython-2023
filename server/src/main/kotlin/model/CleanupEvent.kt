@@ -17,16 +17,15 @@ object CleanupEvent : IntIdTable() {
     val organization = varchar("organization", 100)
     val websiteAddress = varchar("website", 200)
     val eventName = varchar("eventName", 100)
-    //val street = varchar("street", 100)
-    //val zipCode = varchar("zipCode", 10)
+    val street = varchar("street", 100)
+    val zipCode = varchar("zipCode", 10)
     val latitude = double("latitude")
     val longitude = double("longitude")
     val startTime = varchar("startTime", 30)
     val endTime = varchar("endTime", 30)
-    val description = varchar("description", 500)
+    val description = varchar("description", 5000)
     val fileName = varchar("fileName", 50)
     var approved = bool("approved")
-    // TODO approved field -> gets posted to admin page where it can be edited and approved
 }
 
 class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
@@ -40,8 +39,8 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
                 organization = dto.organization
                 websiteAddress = dto.websiteAddress
                 eventName = dto.eventName
-                //street = street
-                //zipCode = zipCode
+                street = dto.street
+                zipCode = dto.zipCode
                 latitude = dto.latitude
                 longitude = dto.longitude
                 startTime = dto.startTime
@@ -76,8 +75,8 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
     var organization by CleanupEvent.organization
     var websiteAddress by CleanupEvent.websiteAddress
     var eventName by CleanupEvent.eventName
-    //var street by CleanupEvent.street
-    //var zipCode by CleanupEvent.zipCode
+    var street by CleanupEvent.street
+    var zipCode by CleanupEvent.zipCode
     var latitude by CleanupEvent.latitude
     var longitude by CleanupEvent.longitude
     var startTime by CleanupEvent.startTime
@@ -95,6 +94,8 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
         organization,
         websiteAddress,
         eventName,
+        street,
+        zipCode,
         latitude,
         longitude,
         startTime,

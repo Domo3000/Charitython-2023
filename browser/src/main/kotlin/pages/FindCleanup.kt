@@ -107,12 +107,7 @@ object FindCleanup : RoutePage {
                 }
 
                 if (events.isNotEmpty()) {
-                    ReactHTML.div {
-                        css {
-                            height = 800.px
-                        }
-                        id = "map-holder"
-                    }
+                    MapUtils.mapHolder()()
                 } else {
                     ReactHTML.p {
                         +"Es wurden leider noch keine Cleanup Events für den nächsten Cleanup Day erstellt!"
@@ -120,7 +115,6 @@ object FindCleanup : RoutePage {
                 }
 
                 ReactHTML.div {
-
                     ReactHTML.div {
                         css {
                             marginTop = 50.px
@@ -145,7 +139,7 @@ object FindCleanup : RoutePage {
                             val marker = LeafletObjectFactory.marker(LatLng(event.latitude, event.longitude)) {
                                 title = event.eventName
                                 icon = LeafletObjectFactory.icon {
-                                    iconUrl = "/static/logo-oval.png"
+                                    iconUrl = "/static/WCD-logo.png"
                                     iconSize = Point(25, 25, true)
                                 }
                             }
