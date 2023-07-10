@@ -7,9 +7,7 @@ import css.ClassNames
 import css.Classes
 import css.Style
 import emotion.react.css
-import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.geo.LatLng
-import io.kvision.maps.externals.leaflet.geometry.Point
 import io.kvision.react.reactWrapper
 import model.CleanUpEventDTO
 import model.CleanUpEvents
@@ -119,13 +117,10 @@ object FindCleanup : RoutePage {
                         val map = MapUtils.map()
 
                         events.forEach { event ->
-                            val marker = LeafletObjectFactory.marker(LatLng(event.latitude, event.longitude)) {
+                            val marker = MapUtils.marker(
+                                coordinates = LatLng(event.latitude, event.longitude),
                                 title = event.eventName
-                                icon = LeafletObjectFactory.icon {
-                                    iconUrl = "/static/WCD-logo.png"
-                                    iconSize = Point(25, 25, true)
-                                }
-                            }
+                            )
 
                             marker.on(
                                 "click",

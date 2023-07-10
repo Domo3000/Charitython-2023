@@ -7,10 +7,8 @@ import css.ClassNames
 import css.Classes
 import emotion.react.css
 import io.ktor.client.statement.*
-import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.events.LeafletMouseEvent
 import io.kvision.maps.externals.leaflet.geo.LatLng
-import io.kvision.maps.externals.leaflet.geometry.Point
 import io.kvision.maps.externals.leaflet.layer.marker.Marker
 import io.kvision.maps.externals.leaflet.map.LeafletMap
 import io.kvision.react.reactWrapper
@@ -318,13 +316,7 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
 
                 map.flyTo(coordinates, 15)
 
-                markerHolder.marker = LeafletObjectFactory.marker(coordinates) {
-                    title = "Event"
-                    icon = LeafletObjectFactory.icon {
-                        iconUrl = "/static/logo-oval.png"
-                        iconSize = Point(25, 25, true)
-                    }
-                }
+                markerHolder.marker = MapUtils.marker(coordinates)
 
                 markerHolder.marker!!.addTo(map)
                 setAddressError(false)

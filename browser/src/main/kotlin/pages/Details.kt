@@ -5,9 +5,7 @@ import components.OverviewProps
 import css.ClassNames
 import css.Classes
 import emotion.react.css
-import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.geo.LatLng
-import io.kvision.maps.externals.leaflet.geometry.Point
 import io.kvision.react.reactWrapper
 import kotlinx.datetime.toJSDate
 import model.CleanUpEventDTO
@@ -133,15 +131,10 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
                     zoom = 11
                 )
 
-                val marker =
-                    LeafletObjectFactory.marker(coordinates) {
-                        title = cleanUpEvent.eventName
-                        icon = LeafletObjectFactory.icon {
-                            iconUrl = "/static/logo-oval.png"
-                            iconSize = Point(25, 25, true)
-                            shadowSize = Point(35, 35, true)
-                        }
-                    }
+                val marker = MapUtils.marker(
+                    coordinates = coordinates,
+                    title = cleanUpEvent.eventName
+                )
 
                 marker.addTo(map)
             }.create())
@@ -224,15 +217,10 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
                     zoom = 11
                 )
 
-                val marker =
-                    LeafletObjectFactory.marker(coordinates) {
-                        title = cleanUpEvent.eventName
-                        icon = LeafletObjectFactory.icon {
-                            iconUrl = "/static/logo-oval.png"
-                            iconSize = Point(25, 25, true)
-                            shadowSize = Point(35, 35, true)
-                        }
-                    }
+                val marker = MapUtils.marker(
+                    coordinates = coordinates,
+                    title = cleanUpEvent.eventName
+                )
 
                 marker.addTo(map)
             }.create())

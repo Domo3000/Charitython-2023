@@ -3,6 +3,7 @@ package utils
 import emotion.react.css
 import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.geo.LatLng
+import io.kvision.maps.externals.leaflet.geometry.Point
 import io.kvision.maps.externals.leaflet.map.LeafletMap
 import kotlinx.browser.document
 import org.w3c.dom.HTMLElement
@@ -46,5 +47,13 @@ object MapUtils {
         layer.addTo(map)
 
         return map
+    }
+
+    fun marker(coordinates: LatLng, size: Int = 100, title: String = "Event") = LeafletObjectFactory.marker(coordinates) {
+        this.title = title
+        icon = LeafletObjectFactory.icon {
+            iconUrl = "/static/marker.png"
+            iconSize = Point(size, size, true)
+        }
     }
 }
