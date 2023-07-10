@@ -14,6 +14,12 @@ object Classes {
     val limitedWidth: CSS = {
         margin = Auto.auto
         maxWidth = 1000.px
+        media("only screen and (min-width: 800px)") {
+            marginTop = 140.px
+        }
+        media("only screen and (max-width: 800px)") {
+            marginTop = 80.px
+        }
     }
 
     val hidden: CSS = {

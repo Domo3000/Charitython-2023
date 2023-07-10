@@ -3,6 +3,7 @@ package pages
 import components.OverviewPage
 import components.OverviewProps
 import components.RoutePage
+import css.ClassNames
 import css.Classes
 import css.Style
 import emotion.react.css
@@ -17,10 +18,7 @@ import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
 import utils.MapUtils
 import utils.Requests
-import web.cssom.ClassName
-import web.cssom.Float
-import web.cssom.pct
-import web.cssom.px
+import web.cssom.*
 import web.dom.document
 
 private external interface EventProps : Props {
@@ -31,64 +29,49 @@ private external interface EventProps : Props {
 private val CleanupDetails = FC<EventProps> { props ->
     val cleanUpEvent = props.cleanUpEvent
 
-    ReactHTML.div {
-        css {
-            width = 25.pct
-            border = Style.border
+    ReactHTML.a {
+        href = "/details/${cleanUpEvent.id}"
+        css(ClassNames.phoneFullWidth) {
+            width = 23.pct
+            borderRadius = 25.px
             float = Float.left
+            margin = 1.pct
+            textDecoration = None.none
+        }
+        onClick = {
+            it.preventDefault()
+            props.stateSetter("/details/${cleanUpEvent.id}", DetailsPage(cleanUpEvent.id))
         }
 
         ReactHTML.img {
             src = cleanUpEvent.fileName.let { fileName -> "/files/$fileName" }
             css {
                 width = 100.pct
-                borderBottom = Style.border
-            }
-            onClick = {
-                props.stateSetter("/details/${cleanUpEvent.id}", DetailsPage(cleanUpEvent.id))
+                aspectRatio = AspectRatio(1.0)
+                objectFit = ObjectFit.cover
+                borderTopLeftRadius = 10.px
+                borderTopRightRadius = 10.px
             }
         }
 
         ReactHTML.div {
             css {
-                padding = 10.px
+                paddingTop = 10.px
             }
 
-            ReactHTML.h1 {
+            ReactHTML.h3 {
+                css {
+                    overflowWrap = OverflowWrap.breakWord
+                }
                 +cleanUpEvent.eventName
             }
+        }
 
-            // TODO wrap in Table
-            IconText {
-                icon = "clock"
-                text = "${cleanUpEvent.startTime} Uhr - ${cleanUpEvent.endTime} Uhr"
+        ReactHTML.a {
+            css {
+                color = Style.pinkColor
             }
-
-            ReactHTML.br {}
-
-            IconText {
-                icon = "person"
-                text = cleanUpEvent.organization
-            }
-
-            ReactHTML.br {}
-
-            ReactHTML.div {
-                ReactHTML.i {
-                    className = ClassName("fa-solid fa-link")
-                }
-                ReactHTML.a {
-                    css {
-                        paddingLeft = 15.px
-                    }
-                    +cleanUpEvent.websiteAddress
-                    href = cleanUpEvent.websiteAddress
-                }
-            }
-
-            ReactHTML.p {
-                +cleanUpEvent.description
-            }
+            +"Weiterlesen »"
         }
     }
 }
@@ -107,7 +90,7 @@ object FindCleanup : RoutePage {
                 }
 
                 if (events.isNotEmpty()) {
-                    MapUtils.mapHolder()()
+                    MapUtils.MapHolder { }
                 } else {
                     ReactHTML.p {
                         +"Es wurden leider noch keine Cleanup Events für den nächsten Cleanup Day erstellt!"

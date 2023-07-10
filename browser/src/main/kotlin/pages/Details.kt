@@ -115,7 +115,9 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
             }
         }
 
-        MapUtils.mapHolder(MapUtils.Format.Wide, mapId)()
+        MapUtils.MapHolder {
+            id = mapId
+        }
 
         ReactHTML.p {
             +cleanUpEvent.description
@@ -204,7 +206,9 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
             }
         }
 
-        MapUtils.mapHolder(MapUtils.Format.Wide, mapId)()
+        MapUtils.MapHolder {
+            id = mapId
+        }
 
         ReactHTML.p {
             +cleanUpEvent.description

@@ -1,33 +1,35 @@
 package components
 
 import css.ClassNames
+import css.Style
 import emotion.react.css
+import kotlinx.browser.window
 import pages.*
 import pages.index.IndexPage
 import react.FC
 import react.Props
+import react.StateSetter
 import react.dom.html.ReactHTML
 import react.useState
-import utils.Style
 import web.cssom.*
 
 private const val DEFAULT_LOGO = "/static/WCD-logo-no-date.png"
 
-private typealias MenuButton = Triple<RoutePage, String, String>
+private typealias MenuButton = Triple<RoutePage, Color, String>
 
 private external interface MenuProps : Props {
     var fileName: String?
     var buttons: List<MenuButton>
     var currentPage: OverviewPage
     var pageSetter: (String, OverviewPage) -> Unit
+    var menuOpen: Boolean
+    var menuOpenSetter: StateSetter<Boolean>
 }
 
 private val PhoneHeader = FC<MenuProps> { props ->
-    val (isMenuOpen, setMenuOpen) = useState(false)
-
     ReactHTML.div {
         css(ClassNames.mobileElement) {
-            height = 60.px
+            height = 60.px // TODO store somewhere and reuse in limitedWidth class marginTop
         }
 
         ReactHTML.img {
@@ -38,7 +40,7 @@ private val PhoneHeader = FC<MenuProps> { props ->
             }
             src = props.fileName ?: DEFAULT_LOGO
             onClick = {
-                setMenuOpen(false)
+                props.menuOpenSetter(false)
                 props.pageSetter("/", IndexPage)
             }
         }
@@ -50,19 +52,19 @@ private val PhoneHeader = FC<MenuProps> { props ->
                 border = None.none
                 float = Float.right
             }
-            onClick = { setMenuOpen(!isMenuOpen) }
+            onClick = { props.menuOpenSetter(!props.menuOpen) }
         }
 
         ReactHTML.div {
             css {
-                display = if (isMenuOpen) Display.block else None.none
+                display = if (props.menuOpen) Display.block else None.none
                 position = Position.absolute
                 top = 60.px
                 left = 0.px
                 width = 100.pct
                 zIndex = integer(2000)
-                marginTop = 10.px
-                background = Color(Style.backgroundColor)
+                paddingTop = 10.px
+                background = Style.backgroundColor()
             }
             ReactHTML.div {
                 css {
@@ -73,10 +75,10 @@ private val PhoneHeader = FC<MenuProps> { props ->
                 props.buttons.forEach { (state, c, t) ->
                     HeaderButton {
                         text = t
-                        color = Color(c)
+                        color = c
                         disabled = props.currentPage == state
                         onClick = {
-                            setMenuOpen(false)
+                            props.menuOpenSetter(false)
                             props.pageSetter("/${state.route}", state)
                         }
                     }
@@ -91,6 +93,7 @@ private val DesktopHeader = FC<MenuProps> { props ->
         css(ClassNames.desktopElement) {
             margin = Auto.auto
             maxWidth = 1000.px
+            height = 140.px
         }
         id = "header"
         ReactHTML.img {
@@ -107,7 +110,7 @@ private val DesktopHeader = FC<MenuProps> { props ->
         props.buttons.forEach { (state, c, t) ->
             HeaderButton {
                 text = t
-                color = Color(c)
+                color = c
                 disabled = props.currentPage == state
                 width = 110.0.px
                 onClick = {
@@ -122,7 +125,7 @@ private object ButtonColorPicker {
     val colors = listOf(Style.yellowColor, Style.pinkColor, Style.blueColor)
     var next = 0
 
-    fun nextColor(): String = colors[next++ % colors.size]
+    fun nextColor(): Color = colors[next++ % colors.size]
 }
 
 external interface HeaderProps : Props {
@@ -138,12 +141,41 @@ val Header = FC<HeaderProps> { props ->
         ShareResultsPage to "Ergebnisse teilen"
     ).map { (page, text) -> Triple(page, ButtonColorPicker.nextColor(), text) }
 
+    val (scrollY, setScrollY) = useState(0.0)
+    val (isMenuOpen, setMenuOpen) = useState(false)
+
     ReactHTML.div {
+        css {
+            position = Position.fixed
+            top = 0.px
+            left = 0.px
+            width = 100.pct
+            zIndex = integer(2000)
+            background = if (scrollY == 0.0 || isMenuOpen) {
+                Style.backgroundColor()
+            } else if(scrollY < 200.0){
+                Style.backgroundColor((5000 / scrollY).toInt())
+            } else {
+                Style.backgroundColor(0)
+            }
+            opacity = if(scrollY < 200.0 || isMenuOpen) {
+                number(1.0)
+            } else if (scrollY < 400.0) {
+                number((50 / (scrollY - 200.0)))
+            } else {
+                number(0.0)
+            }
+            if(scrollY > 400.0 && !isMenuOpen) {
+                display = None.none
+            }
+        }
         PhoneHeader {
             fileName = props.fileName
             this.buttons = buttons
             pageSetter = props.pageSetter
             currentPage = props.currentPage
+            menuOpen = isMenuOpen
+            menuOpenSetter = setMenuOpen
         }
 
         DesktopHeader {
@@ -152,5 +184,9 @@ val Header = FC<HeaderProps> { props ->
             pageSetter = props.pageSetter
             currentPage = props.currentPage
         }
+    }
+
+    window.onscroll = {
+        setScrollY(window.scrollY)
     }
 }

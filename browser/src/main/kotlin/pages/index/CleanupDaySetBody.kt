@@ -1,12 +1,12 @@
 package pages.index
 
+import css.Style
 import emotion.react.css
 import kotlinx.datetime.Clock
 import kotlinx.datetime.toJSDate
 import kotlinx.datetime.toKotlinInstant
 import react.FC
 import react.dom.html.ReactHTML
-import utils.Style
 import utils.getMonthString
 import web.cssom.*
 import kotlin.time.Duration.Companion.days
@@ -18,7 +18,7 @@ val CleanupDaySetBody = FC<CleanupDayProps> { props ->
     ReactHTML.div {
         css {
             height = 100.vh
-            backgroundColor = Color(Style.backgroundColor)
+            backgroundColor = Style.backgroundColor()
             display = Display.flex
             flexDirection = FlexDirection.column
             justifyContent = JustifyContent.spaceEvenly
@@ -60,7 +60,7 @@ val CleanupDaySetBody = FC<CleanupDayProps> { props ->
 
             ReactHTML.div {
                 css {
-                    backgroundColor = Color(Style.yellowColor)
+                    backgroundColor = Style.yellowColor
                     fontSize = IndexCommons.fontSize
                     padding = IndexCommons.padding
                 }
@@ -75,7 +75,7 @@ val CleanupDaySetBody = FC<CleanupDayProps> { props ->
 
             ReactHTML.div {
                 css {
-                    backgroundColor = Color(Style.pinkColor)
+                    backgroundColor = Style.pinkColor
                     fontSize = IndexCommons.fontSize
                     padding = IndexCommons.padding
                 }
@@ -90,7 +90,7 @@ val CleanupDaySetBody = FC<CleanupDayProps> { props ->
 
             ReactHTML.div {
                 css {
-                    backgroundColor = Color(Style.blueColor)
+                    backgroundColor = Style.blueColor
                     fontSize = IndexCommons.fontSize
                     padding = IndexCommons.padding
                 }

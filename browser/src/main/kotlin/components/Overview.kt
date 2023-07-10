@@ -44,7 +44,6 @@ fun overview(component: OverviewPage = IndexPage) = FC<Props> {
         id = "content-holder"
         css {
             minHeight = 600.px
-            paddingBottom = 200.px
             clear = Clear.left
         }
 

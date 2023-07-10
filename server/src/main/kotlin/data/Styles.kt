@@ -13,7 +13,7 @@ fun CssBuilder.styles() {
     }
 
     body {
-        backgroundColor = Color(Style.backgroundColor)
+        backgroundColor = Color(Style.backgroundColor())
     }
 
     button {

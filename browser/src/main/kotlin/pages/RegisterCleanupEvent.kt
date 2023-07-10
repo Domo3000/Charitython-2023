@@ -217,7 +217,7 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
             }
         }
 
-        MapUtils.mapHolder()()
+        MapUtils.MapHolder { }
 
         ReactHTML.p {
             +"Veranstaltungstext:"
@@ -353,7 +353,7 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
 }
 
 object RegisterCleanupEvent : RoutePage {
-    override val route: String = "register-event"
+    override val route: String = "cleanupAnmelden"
     override val component: FC<OverviewProps>
         get() = FC { props ->
             ReactHTML.div {

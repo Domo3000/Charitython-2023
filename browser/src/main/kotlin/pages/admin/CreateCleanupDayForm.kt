@@ -84,7 +84,6 @@ val CreateCleanupDayForm = FC<CreateCleanupDayFormProps> { props ->
                         required = true
                         onChange = {
                             setDateInput(it.target.value)
-                            console.log(it.target.value)
                         }
                     }
                 }

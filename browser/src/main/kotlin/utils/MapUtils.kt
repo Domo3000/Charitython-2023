@@ -10,21 +10,25 @@ import react.*
 import react.dom.html.ReactHTML
 import web.cssom.*
 
+external interface MapProps : Props {
+    var id: String?
+}
+
 object MapUtils {
     val center = LatLng(47.69, 13.34)
 
-    enum class Format(val pct: Percentage) {
-        Square(100.0.pct),
-        Wide(56.25.pct)
-    }
-
-    fun mapHolder(format: Format = Format.Wide, id: String = "map-holder") = FC<Props> {
+    val MapHolder = FC<MapProps> { props ->
         ReactHTML.div {
             css {
                 clear = Clear.left
-                paddingTop = format.pct
+                media("only screen and (min-width: 800px)") {
+                    aspectRatio = AspectRatio(16.0 / 9.0)
+                }
+                media("only screen and (max-width: 800px)") {
+                    aspectRatio = AspectRatio(1.0)
+                }
             }
-            this.id = id
+            this.id = props.id ?: "map-holder"
         }
     }
 

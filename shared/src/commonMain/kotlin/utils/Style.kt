@@ -1,7 +1,8 @@
 package utils
 
 object Style {
-    const val backgroundColor = "#86bd26"
+    fun backgroundColor(opacity: Int = 100) = "rgba(134, 189, 38, $opacity%)"
+
     const val greyColor = "#666666"
     const val yellowColor = "#ffc20e"
     const val pinkColor = "#e11383"
