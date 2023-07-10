@@ -59,6 +59,7 @@ private val CleanupDetails = FC<EventProps> { props ->
 
             ReactHTML.h3 {
                 css {
+                    color = Style.blackColor
                     overflowWrap = OverflowWrap.breakWord
                 }
                 +cleanUpEvent.eventName

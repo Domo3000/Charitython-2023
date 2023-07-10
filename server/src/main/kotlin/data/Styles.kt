@@ -6,9 +6,19 @@ import utils.Style
 typealias CSS = CssBuilder.() -> Unit
 
 fun CssBuilder.styles() {
+    fontFace {
+        fontFamily = "Poppins"
+        src = "url('/static/fonts/Poppins/Poppins-Regular.ttf')"
+    }
+
+    fontFace {
+        fontFamily = "Chau Philomene One"
+        src = "url('/static/fonts/ChauPhilomeneOne/ChauPhilomeneOne-Regular.ttf')"
+    }
+
     rule("*") {
-        color = Color.black
-        fontFamily = "Lucida Console, monospace"
+        color = Color.white
+        fontFamily = "Poppins, Sans-serif"
         textAlign = TextAlign.left
     }
 
@@ -16,10 +26,34 @@ fun CssBuilder.styles() {
         backgroundColor = Color(Style.backgroundColor())
     }
 
+    h1 {
+        fontFamily = "Chau Philomene One, Sans-serif"
+    }
+
+    h2 {
+        fontFamily = "Chau Philomene One, Sans-serif"
+    }
+
+    h3 {
+        fontFamily = "Chau Philomene One, Sans-serif"
+    }
+
     button {
+        color = Color.black
         textAlign = TextAlign.center
         fontWeight = FontWeight.bold
-        fontFamily = "Monaco, monospace"
+    }
+
+    input {
+        color = Color.black
+    }
+
+    textarea {
+        color = Color.black
+    }
+
+    span {
+        color = Color.black
     }
 
     rule("#script-holder") {
@@ -29,7 +63,6 @@ fun CssBuilder.styles() {
 
     rule(".menu") {
         textAlign = TextAlign.left
-        fontFamily = "Monaco, monospace"
         minWidth = LinearDimension("200px")
     }
 

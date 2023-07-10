@@ -12,6 +12,7 @@ object Style {
     val pinkColor = Color(Style.pinkColor)
     val yellowColor = Color(Style.yellowColor)
     val whiteColor = Color(Style.whiteColor)
+    val blackColor = Color("black")
 
     val border = Border(4.px, LineStyle.solid, Color(Style.blueColor))
 }

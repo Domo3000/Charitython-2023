@@ -4,6 +4,7 @@ import components.OverviewPage
 import components.OverviewProps
 import css.ClassNames
 import css.Classes
+import css.Style
 import emotion.react.css
 import io.kvision.maps.externals.leaflet.geo.LatLng
 import io.kvision.react.reactWrapper
@@ -29,6 +30,7 @@ val IconText = FC<IconTextProps> { props ->
         }
         ReactHTML.span {
             css {
+                color = Style.whiteColor
                 paddingLeft = 15.px
             }
             +props.text
