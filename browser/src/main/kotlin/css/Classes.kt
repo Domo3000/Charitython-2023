@@ -15,10 +15,10 @@ object Classes {
         margin = Auto.auto
         maxWidth = 1000.px
         media("only screen and (min-width: 800px)") {
-            marginTop = 140.px
+            marginTop = 150.px
         }
         media("only screen and (max-width: 800px)") {
-            marginTop = 80.px
+            marginTop = 90.px
         }
     }
 

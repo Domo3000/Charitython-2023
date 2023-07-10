@@ -28,6 +28,13 @@ fun Route.publicRoute() = route("/data") {
             call.respond(HttpStatusCode.NotFound, "no results found")
         }
     }
+    get("/background") {
+        BackgroundDao.getLatest()?.let {
+            call.respondMessage(it.toDTO())
+        } ?: run {
+            call.respond(HttpStatusCode.NotFound, "current one might already be in past. next one is not set")
+        }
+    }
     get("/cleanupEvent/{eventId}") {
         val eventId = Integer.parseInt(call.parameters["eventId"])
         val event = CleanupEventDao.getById(eventId)

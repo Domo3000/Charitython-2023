@@ -15,57 +15,13 @@ import web.cssom.Clear
 import web.cssom.Float
 import web.html.InputType
 
-private const val AdminPassword = "adminPassword"
+const val AdminPassword = "adminPassword"
 
-private external interface PasswordFormProps : Props {
-    var setAdmin: StateSetter<Requests.AdminRequests?>
-}
-
-private val PasswordForm = FC<PasswordFormProps> { props ->
-    val (usernameInput, setUsernameInput) = useState("")
-    val (passwordInput, setPasswordInput) = useState("")
-
-    ReactHTML.form {
-        ReactHTML.div {
-            +"Username: "
-            ReactHTML.input {
-                type = InputType.text
-                placeholder = "admin"
-                onChange = {
-                    setUsernameInput(it.target.value)
-                }
-            }
-        }
-        ReactHTML.div {
-            +"Password:"
-            ReactHTML.input {
-                type = InputType.password
-                placeholder = "password"
-                onChange = {
-                    setPasswordInput(it.target.value)
-                }
-            }
-        }
-        ReactHTML.button {
-            +"login"
-        }
-        onSubmit = {
-            it.preventDefault()
-            val adminRequests = Requests.AdminRequests(usernameInput, passwordInput)
-            adminRequests.get("/login") {
-                if (it.status == HttpStatusCode.OK) {
-                    window.localStorage.set(AdminPassword, passwordInput)
-                    props.setAdmin(adminRequests)
-                }
-            }
-        }
-    }
-}
-
-enum class AdminState(val text: String) {
-    CreateCleanupDayState("Cleanup Day"),
-    ApproveEventState("Cleanup Events"),
-    EventResultsState("Event Results")
+enum class AdminState(val text: String, val requireCleanupDay: Boolean) {
+    CreateCleanupDayState("Cleanup Day", false),
+    UploadBackground("Hintergrundbild", false),
+    ApproveEventState("Cleanup Events", true),
+    EventResultsState("Cleanup Ergebnisse", true)
 }
 
 private external interface ControlButtonProps : Props {
@@ -100,17 +56,14 @@ object AdminPage : RoutePage {
 
                 admin?.let {
                     ReactHTML.div {
-                        props.cleanupDay?.let {
-                            AdminState.values().forEach { s ->
+                        val cleanupDayExists = props.cleanupDay != null
+
+                        AdminState.values().forEach { s ->
+                            if (!s.requireCleanupDay || cleanupDayExists) {
                                 AdminControlButton {
                                     this.state = s
                                     this.stateSetter = setState
                                 }
-                            }
-                        } ?: run {
-                            AdminControlButton {
-                                this.state = AdminState.CreateCleanupDayState
-                                this.stateSetter = setState
                             }
                         }
                     }
@@ -134,6 +87,10 @@ object AdminPage : RoutePage {
                             AdminState.EventResultsState -> ApproveEventForm {
                                 this.admin = admin
                                 cleanupDay = props.cleanupDay!!
+                            }
+
+                            AdminState.UploadBackground -> UploadBackgroundForm {
+                                this.admin = admin
                             }
                         }
                     }

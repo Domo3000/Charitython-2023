@@ -1,5 +1,6 @@
 package routing
 
+import com.sksamuel.scrimage.format.Format
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -7,7 +8,10 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import model.*
 import utils.saveImage
 import utils.toLocalDateTime
@@ -42,7 +46,7 @@ fun Route.adminRoute() = authenticate(BASIC_AUTH) {
                         }
 
                         is PartData.FileItem -> {
-                            fileName = partData.saveImage()
+                            fileName = partData.saveImage(format = Format.PNG)
                         }
 
                         else -> {}
@@ -65,6 +69,29 @@ fun Route.adminRoute() = authenticate(BASIC_AUTH) {
                     call.respondMessage(DeletedCleanupDay)
                 } else {
                     call.respond(HttpStatusCode.NotFound)
+                }
+            }
+
+            post("/background") {
+                val date: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+                var fileName: String? = null
+
+                call.receiveMultipart().forEachPart { partData ->
+                    when (partData) {
+                        is PartData.FileItem -> {
+                            fileName = partData.saveImage(scaleToWidth = null)
+                        }
+
+                        else -> {}
+                    }
+                }
+
+                if (fileName == null) {
+                    call.respond(HttpStatusCode.BadRequest, "file was not a supported image")
+                } else {
+                    BackgroundDao.insert(date, fileName!!)
+
+                    call.respondMessage(BackgroundDao.getLatest()?.toDTO())
                 }
             }
         }

@@ -127,7 +127,7 @@ object Requests {
             }
         }
 
-        fun postImage(url: String, image: ByteArray, body: Message, callback: (Message?) -> Unit) {
+        fun postImage(url: String, image: ByteArray, body: Message?, callback: (Message?) -> Unit) {
             MainScope().launch {
                 var message: Message? = null
 
@@ -137,9 +137,11 @@ object Requests {
                             append(HttpHeaders.ContentType, ContentType.Image.PNG)
                             append(HttpHeaders.ContentDisposition, "filename=image.png")
                         })
-                        append("message", body.encode(), Headers.build {
-                            append(HttpHeaders.ContentType, ContentType.Application.Json)
-                        })
+                        body?.let { b ->
+                            append("message", b.encode(), Headers.build {
+                                append(HttpHeaders.ContentType, ContentType.Application.Json)
+                            })
+                        }
                     }) {
                     basicAuth(username, password)
                     onUpload { bytesSentTotal, contentLength ->

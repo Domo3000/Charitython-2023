@@ -1,9 +1,6 @@
 package utils
 
-import model.Admin
-import model.CleanupDay
-import model.CleanupEvent
-import model.CleanupDayResults
+import model.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,6 +15,7 @@ class Connection(url: String, user: String, password: String) {
         )
         transaction {
             SchemaUtils.create(Admin)
+            SchemaUtils.create(Background)
             SchemaUtils.create(CleanupDay)
             SchemaUtils.create(CleanupEvent)
             SchemaUtils.create(CleanupDayResults)

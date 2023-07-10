@@ -3,6 +3,7 @@ package pages.index
 import components.OverviewPage
 import components.OverviewProps
 import emotion.react.css
+import model.BackgroundDTO
 import model.CleanupDayDTO
 import model.CleanupDayResultsDTO
 import react.FC
@@ -28,13 +29,14 @@ object IndexPage : OverviewPage {
     override val component: FC<OverviewProps>
         get() = FC { props ->
             val (results, setResults) = useState<CleanupDayResultsDTO?>(null)
+            val (background, setBackground) = useState<BackgroundDTO?>(null)
 
             ReactHTML.div {
                 css {
                     display = Display.flex
                     flexDirection = FlexDirection.column
                     justifyContent = JustifyContent.spaceEvenly
-                    backgroundImage = url("/static/background.jpg")
+                    backgroundImage = url(background?.fileName?.let { "/files/$it" } ?: "/static/background.jpg")
                     backgroundRepeat = BackgroundRepeat.noRepeat
                     backgroundSize = BackgroundSize.cover
                     backgroundAttachment = BackgroundAttachment.fixed
@@ -45,7 +47,7 @@ object IndexPage : OverviewPage {
                     CleanupDaySetHeader {
                         this.cleanupDay = cleanupDay
                     }
-                }  ?: run {
+                } ?: run {
                     CleanupDayNotSetHeader { }
                 }
             }
@@ -65,6 +67,9 @@ object IndexPage : OverviewPage {
             useEffectOnce {
                 Requests.getMessage("/data/previousCleanupDayResults") { message ->
                     setResults((message as CleanupDayResultsDTO))
+                }
+                Requests.getMessage("/data/background") { message ->
+                    setBackground((message as BackgroundDTO))
                 }
             }
         }
