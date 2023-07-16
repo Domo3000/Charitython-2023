@@ -19,7 +19,7 @@ fun Route.publicRoute() = route("/data") {
     }
     get("/previousCleanupDayResults") {
         val maybeResults = CleanupDayDao.getLast()?.let { previousCleanupDay ->
-            CleanupDayResultsDao.getByIdCleanupDayId(previousCleanupDay.id.value)?.toDTO(previousCleanupDay.date)
+            CleanupDayResultDao.getByIdCleanupDayId(previousCleanupDay.id.value)?.toDTO(previousCleanupDay.date)
         }
 
         maybeResults?.let {
@@ -74,5 +74,10 @@ fun Route.publicRoute() = route("/data") {
 
             call.respondMessage(IdMessage(new.id.value))
         }
+    }
+    post("/cleanupEventResult") {
+        val result = call.receive<CleanupEventResultsDTO>()
+        CleanupEventResultDao.insert(result)
+        call.respond(HttpStatusCode.OK)
     }
 }

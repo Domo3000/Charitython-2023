@@ -15,7 +15,7 @@ object CleanupEvent : IntIdTable() {
     val lastName = varchar("lastName", 100)
     val emailAddress = varchar("emailAddress", 100)
     val organization = varchar("organization", 100)
-    val websiteAddress = varchar("website", 200)
+    val websiteAddress = varchar("website", 200).nullable()
     val eventName = varchar("eventName", 100)
     val street = varchar("street", 100)
     val zipCode = varchar("zipCode", 10)
