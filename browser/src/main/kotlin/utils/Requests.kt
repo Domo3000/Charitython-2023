@@ -92,6 +92,21 @@ object Requests {
             }
         }
 
+        fun getMessage(url: String, callback: (Message?) -> Unit) {
+            MainScope().launch {
+                val response = client.get(prefix + url) {
+                    basicAuth(username, password)
+                }
+                var message: Message? = null
+
+                if (response.status.isSuccess()) {
+                    message = Messages.decode(response.bodyAsText())
+                }
+
+                callback(message)
+            }
+        }
+
         fun delete(url: String, callback: (Message?) -> Unit) {
             MainScope().launch {
                 var message: Message? = null

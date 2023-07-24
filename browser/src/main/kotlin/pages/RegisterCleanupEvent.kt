@@ -152,7 +152,7 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
                 type = InputType.email
             }
             Input {
-                label = "Organisation"
+                label = "Organisation" // TODO clearer name: Organisation/Verein/Unternehmen/Privatperson -> needs different design
                 setter = setOrganization
             }
             Input {
@@ -248,6 +248,8 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
                 @Suppress("CAST_NEVER_SUCCEEDS") // it evidently does succeed
                 val image = imageInput!!.run { Int8Array(this) as ByteArray }
 
+                val website = if(websiteAddress.isBlank()) null else websiteAddress
+
                 Requests.postImage(
                     "/data/cleanupEvent",
                     image,
@@ -257,7 +259,7 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
                         lastName = lastName,
                         emailAddress = emailAddress,
                         organization = organization,
-                        websiteAddress = websiteAddress,
+                        websiteAddress = website,
                         eventName = eventName,
                         street = street,
                         zipCode = zipCode,

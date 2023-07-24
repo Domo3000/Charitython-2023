@@ -17,9 +17,16 @@ fun Route.publicRoute() = route("/data") {
             call.respond(HttpStatusCode.NotFound, "current one might already be in past. next one is not set")
         }
     }
+    get("/previousCleanupDay") {
+        CleanupDayDao.getLast()?.let {
+            call.respondMessage(it.toDTO())
+        } ?: run {
+            call.respond(HttpStatusCode.NotFound, "no previous cleanupDay found")
+        }
+    }
     get("/previousCleanupDayResults") {
         val maybeResults = CleanupDayDao.getLast()?.let { previousCleanupDay ->
-            CleanupDayResultsDao.getByIdCleanupDayId(previousCleanupDay.id.value)?.toDTO(previousCleanupDay.date)
+            CleanupDayResultDao.getByIdCleanupDayId(previousCleanupDay.id.value)?.toDTO(previousCleanupDay.date)
         }
 
         maybeResults?.let {
@@ -74,5 +81,10 @@ fun Route.publicRoute() = route("/data") {
 
             call.respondMessage(IdMessage(new.id.value))
         }
+    }
+    post("/cleanupEventResult") {
+        val result = call.receive<CleanupEventResultDTO>()
+        CleanupEventResultDao.insert(result)
+        call.respond(HttpStatusCode.OK)
     }
 }

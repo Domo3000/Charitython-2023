@@ -13,6 +13,7 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import model.*
+import utils.Excel
 import utils.saveImage
 import utils.toLocalDateTime
 
@@ -22,7 +23,6 @@ fun Route.adminRoute() = authenticate(BASIC_AUTH) {
             call.respond("Authenticated!")
         }
         route("/data") {
-
             post("/approveEvent/{id}") {
                 val eventId = call.parameters["id"]!!.toInt()
                 CleanupEventDao.approve(eventId)
@@ -93,6 +93,49 @@ fun Route.adminRoute() = authenticate(BASIC_AUTH) {
 
                     call.respondMessage(BackgroundDao.getLatest()?.toDTO())
                 }
+            }
+
+            get("/cleanupEventResults/{id}") {
+                val id = Integer.parseInt(call.parameters["id"])
+
+                val results = CleanupEventResultDao.getAllByCleanupDayId(id)
+                call.respondMessage(CleanupEventResultsDTO(results.map { it.toDTO() }))
+            }
+
+            get("/cleanupEventResults/{id}/excel") {
+                val id = Integer.parseInt(call.parameters["id"])
+
+                CleanupDayDao.getById(id)?.let { cleanupDay ->
+                    val date = cleanupDay.date.toString()
+                    val results = CleanupEventResultDao.getAllByCleanupDayId(id)
+
+                    val file = Excel.createExcelFile(results, date)
+
+                    call.respondFile(file)
+                } ?: run {
+                    call.respond(HttpStatusCode.NotFound)
+                }
+            }
+
+            post("/cleanupEventResults/{id}") {
+                val id = Integer.parseInt(call.parameters["id"])
+
+                CleanupEventResultDao.markAsExported(id)
+            }
+
+            delete("/cleanupEventResults/{id}") {
+                val id = Integer.parseInt(call.parameters["id"])
+
+                CleanupEventResultDao.deleteById(id)
+
+                call.respond(HttpStatusCode.OK)
+            }
+
+            delete("/cleanupEventResults") {
+                CleanupEventResultDao.transformToCleanupDayResult()
+                CleanupEventResultDao.deleteAll()
+
+                call.respond(HttpStatusCode.OK)
             }
         }
     }

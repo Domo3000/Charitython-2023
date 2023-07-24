@@ -3,9 +3,7 @@ package pages.index
 import components.OverviewPage
 import components.OverviewProps
 import emotion.react.css
-import model.BackgroundDTO
-import model.CleanupDayDTO
-import model.CleanupDayResultsDTO
+import model.*
 import react.FC
 import react.Props
 import react.dom.html.ReactHTML
@@ -30,6 +28,7 @@ object IndexPage : OverviewPage {
         get() = FC { props ->
             val (results, setResults) = useState<CleanupDayResultsDTO?>(null)
             val (background, setBackground) = useState<BackgroundDTO?>(null)
+            val (events, setEvents) = useState<List<CleanUpEventDTO>>(emptyList())
 
             ReactHTML.div {
                 css {
@@ -70,6 +69,11 @@ object IndexPage : OverviewPage {
                 }
                 Requests.getMessage("/data/background") { message ->
                     setBackground((message as BackgroundDTO))
+                }
+                props.cleanupDay?.let { cleanupDay ->
+                    Requests.getMessage("/data/cleanupEvents/${cleanupDay.id}") { message ->
+                        setEvents((message as CleanUpEvents).events.filter { it.approved })
+                    }
                 }
             }
         }

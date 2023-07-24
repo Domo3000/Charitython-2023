@@ -41,7 +41,7 @@ data class CleanUpEventCreationDTO(
     val lastName: String,
     val emailAddress: String,
     val organization: String,
-    val websiteAddress: String,
+    val websiteAddress: String?,
     val eventName: String,
     val street: String,
     val zipCode: String,
@@ -60,7 +60,7 @@ data class CleanUpEventDTO(
     val lastName: String,
     val emailAddress: String,
     val organization: String,
-    val websiteAddress: String,
+    val websiteAddress: String?,
     val eventName: String,
     val street: String,
     val zipCode: String,
@@ -84,6 +84,35 @@ data class Location(
     val longitude: String,
     val street: String,
     val zipCode: String
+) : Message()
+
+@Serializable
+data class CleanupEventResultDTO(
+    val cleanupDayId: Int,
+    val emailAddress: String,
+    val organization: String,
+    val partnerOrganization: String?,
+    val province: String,
+    val location: String,
+    val zipCode: String,
+    val numberOfParticipants: Int,
+    val totalWeight: Double,
+    val amountOfTrashBags: Double?,
+    val cleanedAreaSize: String?,
+    val cigaretteButtsCount: Int?,
+    val canCount: Int?,
+    val petBottleCount: Int?,
+    val glassBottleCount: Int?,
+    val hazardousWaste: String?,
+    val strangeFinds: String?,
+    val miscellaneous: String?,
+    val wayOfRecognition: String,
+    val id: Int? = null
+) : Message()
+
+@Serializable
+data class CleanupEventResultsDTO(
+    val results: List<CleanupEventResultDTO>
 ) : Message()
 
 object Messages {

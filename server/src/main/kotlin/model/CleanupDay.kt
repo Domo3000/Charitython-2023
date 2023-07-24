@@ -22,10 +22,17 @@ object CleanupDay : IntIdTable() {
 
 class CleanupDayDao(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<CleanupDayDao>(CleanupDay) {
-        fun insert(date: LocalDateTime, fileName: String) = transaction { new {
-            this.date = date
-            this.fileName = fileName
-        } }
+        fun insert(date: LocalDateTime, fileName: String) = transaction {
+            new {
+                this.date = date
+                this.fileName = fileName
+            }
+        }
+
+        fun getById(id: Int) = transaction {
+            find { CleanupDay.id.eq(id) }.firstOrNull()
+        }
+
         fun getNext() = transaction {
             find {
                 CleanupDay.date.greater(
@@ -33,6 +40,7 @@ class CleanupDayDao(id: EntityID<Int>) : IntEntity(id) {
                 )
             }.orderBy(CleanupDay.date to SortOrder.ASC).firstOrNull()
         }
+
         fun getLast() = transaction {
             find {
                 CleanupDay.date.less(
@@ -40,6 +48,7 @@ class CleanupDayDao(id: EntityID<Int>) : IntEntity(id) {
                 )
             }.orderBy(CleanupDay.date to SortOrder.DESC).firstOrNull()
         }
+
         fun deleteById(id: Int) = transaction {
             CleanupDay.deleteWhere { CleanupDay.id eq id } // TODO cascade
         }

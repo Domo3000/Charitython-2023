@@ -14,7 +14,7 @@ import kotlinx.datetime.Month
 import kotlinx.serialization.json.Json
 import model.AdminDao
 import model.CleanupDayDao
-import model.CleanupDayResultsDao
+import model.CleanupDayResultDao
 import org.slf4j.LoggerFactory
 import routing.BASIC_AUTH
 import routing.installRouting
@@ -64,7 +64,7 @@ private fun Application.body(debug: Boolean) {
                 "unused"
             )
 
-            CleanupDayResultsDao.insert(previousCleanupDay.id.value, 27.0, 14000)
+            CleanupDayResultDao.insert(previousCleanupDay.id.value, 27.0, 14000)
         }
 
         authentication {
