@@ -19,5 +19,10 @@ val Footer = FC<OverviewProps> { props ->
             onClick = { props.stateSetter("/${ImpressumPage.route}", ImpressumPage) }
             +"Impressum"
         }
+        ReactHTML.h6 {
+            css(Classes.centered)
+            onClick = { props.stateSetter("/${ImpressumPage.route}", ImpressumPage) }
+            +"Datenschutz"
+        }
     }
 }

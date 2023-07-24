@@ -2,16 +2,20 @@ package pages.index
 
 import components.OverviewPage
 import components.OverviewProps
+import css.Classes
 import emotion.react.css
+import io.kvision.maps.externals.leaflet.geo.LatLng
+import io.kvision.react.reactWrapper
 import model.*
-import react.FC
-import react.Props
+import pages.DetailsPage
+import react.*
+import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
-import react.useEffectOnce
-import react.useState
+import utils.MapUtils
 import utils.Requests
 import utils.Style
 import web.cssom.*
+import web.dom.document
 
 object IndexCommons {
     val fontSize = 2.5.em
@@ -57,9 +61,44 @@ object IndexPage : OverviewPage {
                 }
             }
 
+            ReactHTML.div {
+                css {
+                    margin = Auto.auto
+                    maxWidth = 1000.px
+                    if (events.isEmpty()) {
+                        display = None.none
+                    } else {
+                        paddingTop = 10.px
+                        minHeight = 600.px
+                    }
+                }
+                MapUtils.MapHolder { }
+            }
+
             results?.let { previousCleanupResults ->
                 CleanupDayResults {
                     this.results = previousCleanupResults
+                }
+            }
+
+            useEffect(events) {
+                if(events.isNotEmpty()) {
+                    hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
+                        val map = MapUtils.map()
+
+                        events.forEach { event ->
+                            val marker = MapUtils.marker(
+                                coordinates = LatLng(event.latitude, event.longitude),
+                                title = event.eventName
+                            )
+
+                            marker.on(
+                                "click",
+                                { props.stateSetter("/details/${event.id}", DetailsPage(event.id)) })
+
+                            marker.addTo(map)
+                        }
+                    }.create())
                 }
             }
 

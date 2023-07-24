@@ -118,7 +118,7 @@ val CleanupDaySetBody = FC<CleanupDayProps> { props ->
                     color = IndexCommons.textColor
                 }
 
-                +"Am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} der World Cleanup Day statt. Weltweit werden an diesem Tag Straßen, Flüsse, Wälder und Strände von Müll befreit. Wir koordinieren dieses Event österreichweit."
+                +"Am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} findet der World Cleanup Day statt. Weltweit werden an diesem Tag Straßen, Flüsse, Wälder und Strände von Müll befreit. Wir koordinieren dieses Event österreichweit."
             }
 
             ReactHTML.p {

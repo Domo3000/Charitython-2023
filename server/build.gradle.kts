@@ -52,7 +52,7 @@ dependencies {
 }
 
 tasks.withType<ShadowJar> {
-    archiveBaseName.set("portfolio")
+    archiveBaseName.set("worldCleanupDay")
     archiveClassifier.set("")
     archiveVersion.set("v1")
 

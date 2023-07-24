@@ -4,7 +4,7 @@ import emotion.react.css
 import kotlinx.datetime.toJSDate
 import react.FC
 import react.dom.html.ReactHTML
-import utils.Style
+import css.Style
 import utils.getMonthString
 import web.cssom.Color
 import web.cssom.Display
@@ -17,7 +17,7 @@ val CleanupDaySetHeader = FC<CleanupDayProps> { props ->
     ReactHTML.h1 {
         css {
             fontSize = 2.2.em
-            background = Color(Style.whiteColor)
+            color = Style.pinkColor
         }
 
         +"Am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} ist wieder World Cleanup Day!"
@@ -26,7 +26,7 @@ val CleanupDaySetHeader = FC<CleanupDayProps> { props ->
     ReactHTML.h2 {
         css {
             fontSize = 3.em
-            background = Color(Style.whiteColor)
+            color = Style.pinkColor
         }
 
         +"In ganz Österreich wird aufgeräumt. Gemeinsam schaffen wir eine saubere Umwelt."
@@ -40,12 +40,12 @@ val CleanupDaySetHeader = FC<CleanupDayProps> { props ->
 
         components.HeaderButton {
             text = "Cleanup anmelden"
-            color = Color(Style.yellowColor)
+            color = Style.yellowColor
         }
 
         components.HeaderButton {
             text = "Cleanup finden"
-            color = Color(Style.pinkColor)
+            color = Style.pinkColor
         }
     }
 }
