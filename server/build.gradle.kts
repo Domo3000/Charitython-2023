@@ -18,6 +18,9 @@ dependencies {
 
     implementation(project(":shared"))
 
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
+
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.20")
 
     implementation("io.ktor:ktor-client-core:$ktorVersion")

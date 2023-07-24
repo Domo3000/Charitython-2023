@@ -5,6 +5,7 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -20,7 +21,7 @@ object CleanupEventResult : IntIdTable() {
     val numberOfParticipants = integer("numberOfParticipants")
     val totalWeight = double("totalWeight")
     val amountOfTrashBags = double("amountOfTrashBags").nullable()
-    val cleanedAreaSize = varchar("cleanedAreaSize", 100)
+    val cleanedAreaSize = varchar("cleanedAreaSize", 100).nullable()
     val cigaretteButtsCount = integer("cigaretteButtsCount").nullable()
     val canCount = integer("canCount").nullable()
     val petBottleCount = integer("petBottleCount").nullable()
@@ -34,7 +35,7 @@ object CleanupEventResult : IntIdTable() {
 
 class CleanupEventResultDao(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<CleanupEventResultDao>(CleanupEventResult) {
-        fun insert(dto: CleanupEventResultsDTO): CleanupEventResultDao = transaction {
+        fun insert(dto: CleanupEventResultDTO): CleanupEventResultDao = transaction {
             return@transaction new {
                 cleanupDayId = dto.cleanupDayId
                 emailAddress = dto.emailAddress
@@ -65,7 +66,7 @@ class CleanupEventResultDao(id: EntityID<Int>) : IntEntity(id) {
             }.toList()
         }
 
-        fun export(id: Int) = transaction {
+        fun markAsExported(id: Int) = transaction {
             CleanupEventResult.update({ CleanupEventResult.id.eq(id) }) {
                 it[exported] = true
             }
@@ -73,8 +74,20 @@ class CleanupEventResultDao(id: EntityID<Int>) : IntEntity(id) {
 
         fun transformToCleanupDayResult() = transaction {
             all().toList().forEach { result ->
-                CleanupDayResultDao.upsert(result.cleanupDayId, result.totalWeight, result.numberOfParticipants)
+                CleanupDayResultDao.upsert(result.cleanupDayId, result.totalWeight / 1000, result.numberOfParticipants)
             }
+        }
+
+        fun getAll() = transaction {
+            all().toList()
+        }
+
+        fun deleteAll() = transaction {
+            CleanupEventResult.deleteAll()
+        }
+
+        fun deleteById(id: Int) = transaction {
+            CleanupEventResult.deleteWhere { this.id.eq(id) }
         }
 
         fun deleteExported() = transaction {
@@ -103,7 +116,7 @@ class CleanupEventResultDao(id: EntityID<Int>) : IntEntity(id) {
     var wayOfRecognition by CleanupEventResult.wayOfRecognition
     var exported by CleanupEventResult.exported
 
-    fun toDTO(): CleanupEventResultsDTO = CleanupEventResultsDTO(
+    fun toDTO(): CleanupEventResultDTO = CleanupEventResultDTO(
         cleanupDayId,
         emailAddress,
         organization,
@@ -122,6 +135,7 @@ class CleanupEventResultDao(id: EntityID<Int>) : IntEntity(id) {
         hazardousWaste,
         strangeFinds,
         miscellaneous,
-        wayOfRecognition
+        wayOfRecognition,
+        id.value
     )
 }

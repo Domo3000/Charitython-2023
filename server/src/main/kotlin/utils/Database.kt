@@ -19,6 +19,7 @@ class Connection(url: String, user: String, password: String) {
             SchemaUtils.create(CleanupDay)
             SchemaUtils.create(CleanupEvent)
             SchemaUtils.create(CleanupDayResult)
+            SchemaUtils.create(CleanupEventResult)
         }
     }
 }

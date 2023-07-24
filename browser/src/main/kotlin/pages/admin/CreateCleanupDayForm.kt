@@ -18,6 +18,7 @@ import utils.getMonthString
 import web.cssom.rem
 import web.file.FileReader
 import web.html.InputType
+import web.prompts.alert
 import kotlin.js.Date
 
 external interface CreateCleanupDayFormProps : Props {
@@ -41,7 +42,10 @@ val CreateCleanupDayForm = FC<CreateCleanupDayFormProps> { props ->
             }
 
             ReactHTML.dialog {
-                +"Wirklich? Das löscht alle Events und sonstige Daten"
+                +"Wirklich?"
+                css {
+                    backgroundColor = css.Style.blackColor
+                }
                 open = warningDialog
                 ReactHTML.div {
                     ReactHTML.button {
@@ -56,6 +60,10 @@ val CreateCleanupDayForm = FC<CreateCleanupDayFormProps> { props ->
                             props.admin.delete("/data/cleanupDay/${cleanupDay.id}") {
                                 if (it == DeletedCleanupDay) {
                                     props.setCleanupDay(null)
+                                }
+
+                                it ?: run {
+                                    alert("Lösche vorher alle Daten manuell")
                                 }
                             }
                         }

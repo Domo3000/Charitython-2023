@@ -87,7 +87,7 @@ data class Location(
 ) : Message()
 
 @Serializable
-data class CleanupEventResultsDTO(
+data class CleanupEventResultDTO(
     val cleanupDayId: Int,
     val emailAddress: String,
     val organization: String,
@@ -98,7 +98,7 @@ data class CleanupEventResultsDTO(
     val numberOfParticipants: Int,
     val totalWeight: Double,
     val amountOfTrashBags: Double?,
-    val cleanedAreaSize: String,
+    val cleanedAreaSize: String?,
     val cigaretteButtsCount: Int?,
     val canCount: Int?,
     val petBottleCount: Int?,
@@ -106,7 +106,13 @@ data class CleanupEventResultsDTO(
     val hazardousWaste: String?,
     val strangeFinds: String?,
     val miscellaneous: String?,
-    val wayOfRecognition: String
+    val wayOfRecognition: String,
+    val id: Int? = null
+) : Message()
+
+@Serializable
+data class CleanupEventResultsDTO(
+    val results: List<CleanupEventResultDTO>
 ) : Message()
 
 object Messages {

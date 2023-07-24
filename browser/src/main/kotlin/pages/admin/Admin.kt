@@ -21,7 +21,7 @@ enum class AdminState(val text: String, val requireCleanupDay: Boolean) {
     CreateCleanupDayState("Cleanup Day", false),
     UploadBackground("Hintergrundbild", false),
     ApproveEventState("Cleanup Events", true),
-    EventResultsState("Cleanup Ergebnisse", true)
+    EventResultsState("Cleanup Ergebnisse", false)
 }
 
 private external interface ControlButtonProps : Props {
@@ -84,9 +84,8 @@ object AdminPage : RoutePage {
                                 cleanupDay = props.cleanupDay!!
                             }
 
-                            AdminState.EventResultsState -> ApproveEventForm {
+                            AdminState.EventResultsState -> CleanupResultsForm {
                                 this.admin = admin
-                                cleanupDay = props.cleanupDay!!
                             }
 
                             AdminState.UploadBackground -> UploadBackgroundForm {
