@@ -32,7 +32,7 @@ val Routing = FC<Props> {
             }
             PathRoute {
                 path = "/details/:id"
-                element = createElement(overview(DetailsPage(null)))
+                element = createElement(overview(CleanUpInformation(null)))
             }
 
             PathRoute {
