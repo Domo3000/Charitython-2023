@@ -7,13 +7,11 @@ import emotion.react.css
 import io.ktor.http.*
 import kotlinx.browser.window
 import org.w3c.dom.get
-import org.w3c.dom.set
 import react.*
 import react.dom.html.ReactHTML
 import utils.Requests
 import web.cssom.Clear
 import web.cssom.Float
-import web.html.InputType
 
 const val AdminPassword = "adminPassword"
 
@@ -21,7 +19,9 @@ enum class AdminState(val text: String, val requireCleanupDay: Boolean) {
     CreateCleanupDayState("Cleanup Day", false),
     UploadBackground("Hintergrundbild", false),
     ApproveEventState("Cleanup Events", true),
-    EventResultsState("Cleanup Ergebnisse", false)
+    EventResultsState("Cleanup Ergebnisse", false),
+    CleanupResultState("CleanupDay Ergebniss", false),
+    GDPRState("GDPR", false)
 }
 
 private external interface ControlButtonProps : Props {
@@ -91,13 +91,16 @@ object AdminPage : RoutePage {
                             AdminState.UploadBackground -> UploadBackgroundForm {
                                 this.admin = admin
                             }
+
+                            AdminState.CleanupResultState -> CleanupDayResultForm {
+                                this.admin = admin
+                            }
+
+                            AdminState.GDPRState -> GDPRForm {
+                                this.admin = admin
+                            }
                         }
                     }
-
-                    // TODO delete Day/Events
-                    // TODO list all Event results with CSV export
-                    // TODO accept Event Registrations
-
                 } ?: run {
                     PasswordForm {
                         this.setAdmin = setAdmin

@@ -32,16 +32,24 @@ private val PhoneHeader = FC<MenuProps> { props ->
             height = 60.px // TODO store somewhere and reuse in limitedWidth class marginTop
         }
 
-        ReactHTML.img {
+        ReactHTML.a {
+            href = "/"
             css {
                 height = 100.pct
-                objectFit = ObjectFit.contain
                 float = Float.left
             }
-            src = props.fileName ?: DEFAULT_LOGO
             onClick = {
+                it.preventDefault()
                 props.menuOpenSetter(false)
                 props.pageSetter("/", IndexPage)
+            }
+
+            ReactHTML.img {
+                css {
+                    height = 100.pct
+                    objectFit = ObjectFit.contain
+                }
+                src = props.fileName ?: DEFAULT_LOGO
             }
         }
         ReactHTML.button {
@@ -75,6 +83,7 @@ private val PhoneHeader = FC<MenuProps> { props ->
                 props.buttons.forEach { (state, c, t) ->
                     HeaderButton {
                         text = t
+                        link = "/${state.route}"
                         color = c
                         disabled = props.currentPage == state
                         onClick = {
@@ -96,20 +105,29 @@ private val DesktopHeader = FC<MenuProps> { props ->
             height = 140.px
         }
         id = "header"
-        ReactHTML.img {
+        ReactHTML.a {
+            href = "/"
             css {
+                height = 100.pct
                 maxWidth = 200.px
-                objectFit = ObjectFit.contain
                 float = Float.left
             }
-            src = props.fileName ?: DEFAULT_LOGO
             onClick = {
+                it.preventDefault()
                 props.pageSetter("/", IndexPage)
+            }
+            ReactHTML.img {
+                css {
+                    maxWidth = 200.px
+                    objectFit = ObjectFit.contain
+                }
+                src = props.fileName ?: DEFAULT_LOGO
             }
         }
         props.buttons.forEach { (state, c, t) ->
             HeaderButton {
                 text = t
+                link = "/${state.route}"
                 color = c
                 disabled = props.currentPage == state
                 width = 110.0.px
@@ -153,19 +171,19 @@ val Header = FC<HeaderProps> { props ->
             zIndex = integer(2000)
             background = if (scrollY == 0.0 || isMenuOpen) {
                 Style.backgroundColor()
-            } else if(scrollY < 200.0){
+            } else if (scrollY < 200.0) {
                 Style.backgroundColor((5000 / scrollY).toInt())
             } else {
                 Style.backgroundColor(0)
             }
-            opacity = if(scrollY < 200.0 || isMenuOpen) {
+            opacity = if (scrollY < 200.0 || isMenuOpen) {
                 number(1.0)
             } else if (scrollY < 400.0) {
                 number((50 / (scrollY - 200.0)))
             } else {
                 number(0.0)
             }
-            if(scrollY > 400.0 && !isMenuOpen) {
+            if (scrollY > 400.0 && !isMenuOpen) {
                 display = None.none
             }
         }

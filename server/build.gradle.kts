@@ -73,10 +73,6 @@ tasks.withType<ShadowJar> {
     manifest {
         attributes(Pair("Implementation-Version", "1.15"))
     }
-
-    minimize {
-        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect"))
-    }
 }
 
 tasks.getByName<JavaExec>("run") {

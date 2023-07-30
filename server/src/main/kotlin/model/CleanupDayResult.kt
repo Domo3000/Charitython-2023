@@ -5,6 +5,8 @@ import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import utils.toInstant
@@ -38,6 +40,10 @@ class CleanupDayResultDao(id: EntityID<Int>) : IntEntity(id) {
                     this.participants = participants
                 }
             }
+        }
+
+        fun deleteByCleanupDayId(cleanupDayId: Int) = transaction {
+            CleanupDayResult.deleteWhere { this.cleanupDayId.eq(cleanupDayId) }
         }
 
         fun getByIdCleanupDayId(id: Int): CleanupDayResultDao? = transaction {

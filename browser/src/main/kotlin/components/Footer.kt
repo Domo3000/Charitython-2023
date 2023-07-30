@@ -2,6 +2,7 @@ package components
 
 import css.Classes
 import emotion.react.css
+import pages.DataProtectionPolicyPage
 import pages.ImpressumPage
 import react.FC
 import react.dom.html.ReactHTML
@@ -14,15 +15,30 @@ val Footer = FC<OverviewProps> { props ->
             paddingTop = 100.px
             clear = Clear.left
         }
-        ReactHTML.h6 {
+        ReactHTML.div {
             css(Classes.centered)
-            onClick = { props.stateSetter("/${ImpressumPage.route}", ImpressumPage) }
-            +"Impressum"
-        }
-        ReactHTML.h6 {
-            css(Classes.centered)
-            onClick = { props.stateSetter("/${ImpressumPage.route}", ImpressumPage) }
-            +"Datenschutz"
+            ReactHTML.a {
+                css {
+                    margin = 20.px
+                }
+                href = "/${ImpressumPage.route}"
+                onClick = {
+                    it.preventDefault()
+                    props.stateSetter("/${ImpressumPage.route}", ImpressumPage)
+                }
+                +"Impressum"
+            }
+            ReactHTML.a {
+                css {
+                    margin = 20.px
+                }
+                href = "/${DataProtectionPolicyPage.route}"
+                onClick = {
+                    it.preventDefault()
+                    props.stateSetter("/${DataProtectionPolicyPage.route}", DataProtectionPolicyPage)
+                }
+                +"Datenschutz"
+            }
         }
     }
 }

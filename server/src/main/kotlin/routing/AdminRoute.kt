@@ -8,6 +8,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.css.Clear
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -136,6 +137,13 @@ fun Route.adminRoute() = authenticate(BASIC_AUTH) {
                 CleanupEventResultDao.deleteAll()
 
                 call.respond(HttpStatusCode.OK)
+            }
+
+            post("/previousCleanupDayResults") {
+                    val result = call.receive<CleanupDayResultsDTO>()
+                    CleanupDayResultDao.deleteByCleanupDayId(result.cleanupDayId)
+                    CleanupDayResultDao.insert(result.cleanupDayId, result.garbage, result.participants)
+                    call.respond(HttpStatusCode.OK)
             }
         }
     }

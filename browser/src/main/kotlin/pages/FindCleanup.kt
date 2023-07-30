@@ -14,8 +14,10 @@ import model.CleanUpEvents
 import react.*
 import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
+import utils.Defaults
 import utils.MapUtils
 import utils.Requests
+import utils.getFileName
 import web.cssom.*
 import web.dom.document
 
@@ -42,7 +44,7 @@ private val CleanupDetails = FC<EventProps> { props ->
         }
 
         ReactHTML.img {
-            src = cleanUpEvent.fileName.let { fileName -> "/files/$fileName" }
+            src = getFileName(cleanUpEvent.fileName, Defaults.defaultEventPicture)
             css {
                 width = 100.pct
                 aspectRatio = AspectRatio(1.0)

@@ -24,13 +24,13 @@ object CleanupEvent : IntIdTable() {
     val startTime = varchar("startTime", 30)
     val endTime = varchar("endTime", 30)
     val description = varchar("description", 5000)
-    val fileName = varchar("fileName", 50)
+    val fileName = varchar("fileName", 50).nullable()
     var approved = bool("approved")
 }
 
 class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<CleanupEventDao>(CleanupEvent) {
-        fun insert(dto: CleanUpEventCreationDTO, fileName: String): CleanupEventDao = transaction {
+        fun insert(dto: CleanUpEventCreationDTO, fileName: String?): CleanupEventDao = transaction {
             return@transaction new {
                 cleanupDayId = dto.cleanupDayId
                 firstName = dto.firstName

@@ -69,7 +69,7 @@ data class CleanUpEventDTO(
     val startTime: String,
     val endTime: String,
     val description: String,
-    val fileName: String,
+    val fileName: String?,
     val approved: Boolean
 ) : Message()
 

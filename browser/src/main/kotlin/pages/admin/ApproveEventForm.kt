@@ -8,7 +8,9 @@ import model.CleanupDayDTO
 import pages.IconText
 import react.*
 import react.dom.html.ReactHTML
+import utils.Defaults
 import utils.Requests
+import utils.getFileName
 import web.cssom.ClassName
 import web.cssom.Float
 import web.cssom.pct
@@ -33,7 +35,7 @@ private val CleanupDetails = FC<ApproveEventProps> { props ->
         }
 
         ReactHTML.img {
-            src = cleanUpEvent.fileName.let { fileName -> "/files/$fileName" }
+            src = getFileName(cleanUpEvent.fileName, Defaults.defaultEventPicture)
             css {
                 width = 100.pct
                 borderBottom = Style.border
@@ -139,13 +141,19 @@ val ApproveEventForm = FC<ApproveEventFormProps> { props ->
     val cleanupDay = props.cleanupDay
     val (events, setEvents) = useState<List<CleanUpEventDTO>>(emptyList())
 
-    ReactHTML.div {
-        events.filterNot { it.approved }.forEach { event ->
-            CleanupDetails {
-                this.cleanupDay = cleanupDay
-                cleanUpEvent = event
-                admin = props.admin
-                this.setEvents = setEvents
+    if (events.filterNot { it.approved }.isEmpty()) {
+        ReactHTML.div {
+            +"Keine Events zum approven!"
+        }
+    } else {
+        ReactHTML.div {
+            events.filterNot { it.approved }.forEach { event ->
+                CleanupDetails {
+                    this.cleanupDay = cleanupDay
+                    cleanUpEvent = event
+                    admin = props.admin
+                    this.setEvents = setEvents
+                }
             }
         }
     }

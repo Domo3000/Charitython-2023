@@ -14,8 +14,10 @@ import react.*
 import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
 import react.router.useParams
+import utils.Defaults
 import utils.MapUtils
 import utils.Requests
+import utils.getFileName
 import web.cssom.*
 
 external interface IconTextProps : Props {
@@ -25,6 +27,10 @@ external interface IconTextProps : Props {
 
 val IconText = FC<IconTextProps> { props ->
     ReactHTML.div {
+        css { 
+            marginTop = 15.px
+            marginBottom = 15.px
+        }
         ReactHTML.i {
             className = ClassName("fa-solid fa-${props.icon}")
         }
@@ -64,7 +70,7 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
 
             ReactHTML.div {
                 ReactHTML.h2 {
-                    +"WANN"
+                    +"WANN & WO"
                 }
 
                 IconText {
@@ -72,11 +78,14 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
                     text = props.cleanupDayDate
                 }
 
-                ReactHTML.br {}
-
                 IconText {
                     icon = "clock"
                     text = "${cleanUpEvent.startTime} Uhr - ${cleanUpEvent.endTime} Uhr"
+                }
+
+                IconText {
+                    icon = "map-marker-alt"
+                    text = "${cleanUpEvent.zipCode} ${cleanUpEvent.street}"
                 }
             }
 
@@ -90,24 +99,24 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
                     text = cleanUpEvent.organization
                 }
 
-                ReactHTML.br {}
-
-                ReactHTML.div {
-                    ReactHTML.i {
-                        className = ClassName("fa-solid fa-link")
-                    }
-                    ReactHTML.a {
-                        css {
-                            paddingLeft = 15.px
+                cleanUpEvent.websiteAddress?.let { website ->
+                    ReactHTML.div {
+                        ReactHTML.i {
+                            className = ClassName("fa-solid fa-link")
                         }
-                        +cleanUpEvent.websiteAddress
-                        href = cleanUpEvent.websiteAddress
+                        ReactHTML.a {
+                            css {
+                                paddingLeft = 15.px
+                            }
+                            +website
+                            href = website
+                        }
                     }
                 }
             }
 
             ReactHTML.img {
-                src = cleanUpEvent.fileName.let { fileName -> "/files/$fileName" }
+                src = getFileName(cleanUpEvent.fileName, Defaults.defaultEventPicture)
                 css {
                     width = 300.px
                     borderLeft = css.Style.border
@@ -152,7 +161,7 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
         className = ClassNames.mobileElement
 
         ReactHTML.img {
-            src = cleanUpEvent.fileName.let { fileName -> "/files/$fileName" }
+            src = getFileName(cleanUpEvent.fileName, Defaults.defaultEventPicture)
             css {
                 width = 100.pct
                 borderBottom = css.Style.border
@@ -169,35 +178,36 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
             text = props.cleanupDayDate
         }
 
-        ReactHTML.br {}
-
         IconText {
             icon = "clock"
             text = "${cleanUpEvent.startTime} Uhr - ${cleanUpEvent.endTime} Uhr"
         }
-
-        ReactHTML.br {}
 
         IconText {
             icon = "person"
             text = cleanUpEvent.organization
         }
 
-        ReactHTML.br {}
+        IconText {
+            icon = "map-marker-alt"
+            text = "${cleanUpEvent.zipCode} ${cleanUpEvent.street}"
+        }
 
-        ReactHTML.div {
-            css {
-                marginBottom = 2.rem
-            }
-            ReactHTML.i {
-                className = ClassName("fa-solid fa-link")
-            }
-            ReactHTML.a {
+        cleanUpEvent.websiteAddress?.let { website ->
+            ReactHTML.div {
                 css {
-                    paddingLeft = 15.px
+                    marginBottom = 2.rem
                 }
-                +cleanUpEvent.websiteAddress
-                href = cleanUpEvent.websiteAddress
+                ReactHTML.i {
+                    className = ClassName("fa-solid fa-link")
+                }
+                ReactHTML.a {
+                    css {
+                        paddingLeft = 15.px
+                    }
+                    +website
+                    href = website
+                }
             }
         }
 

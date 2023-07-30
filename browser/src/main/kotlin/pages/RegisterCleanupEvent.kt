@@ -1,9 +1,6 @@
 package pages
 
-import components.OverviewPage
-import components.OverviewProps
-import components.RoutePage
-import css.ClassNames
+import components.*
 import css.Classes
 import emotion.react.css
 import io.ktor.client.statement.*
@@ -28,43 +25,14 @@ import react.dom.html.ReactHTML
 import utils.MapUtils
 import utils.Requests
 import utils.getMonthString
-import web.cssom.*
+import web.cssom.pct
+import web.cssom.px
 import web.dom.document
 import web.file.FileReader
 import web.html.ButtonType
 import web.html.InputType
 import web.location.location
 import web.prompts.alert
-
-private external interface InputProps : Props {
-    var label: String
-    var setter: StateSetter<String>
-    var type: InputType?
-    var optional: Boolean?
-    var error: Boolean
-}
-
-private val Input = FC<InputProps> { props ->
-    ReactHTML.tr {
-        ReactHTML.td {
-            +"${props.label}:"
-        }
-        ReactHTML.td {
-            ReactHTML.input {
-                if (props.error) {
-                    css {
-                        background = Color("#FFAA99")
-                    }
-                }
-                type = props.type ?: InputType.text
-                required = props.optional?.let { !it } ?: true
-                onChange = {
-                    props.setter(it.target.value)
-                }
-            }
-        }
-    }
-}
 
 private external interface RegisterFormProps : Props {
     var cleanupDay: CleanupDayDTO
@@ -76,7 +44,6 @@ private object RequestHelper {
 
     fun getWithTimeout(
         url: String,
-        setAddressError: StateSetter<Boolean>,
         setTimeout: StateSetter<Int?>,
         callback: (Location) -> Unit
     ) {
@@ -85,16 +52,13 @@ private object RequestHelper {
                 200 -> scope.launch {
                     val location = Messages.decode(response.bodyAsText()) as Location
                     callback(location)
-                    setAddressError(false)
                 }
 
                 429 -> setTimeout(window.setTimeout({
-                    getWithTimeout(url, setAddressError, setTimeout, callback)
+                    getWithTimeout(url, setTimeout, callback)
                 }, 1000))
 
-                else -> {
-                    setAddressError(true)
-                }
+                else -> {}
             }
         }
     }
@@ -109,17 +73,16 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
     val (lastName, setLastName) = useState("")
     val (emailAddress, setEmailAddress) = useState("")
     val (organization, setOrganization) = useState("")
-    val (websiteAddress, setWebsiteAddress) = useState("")
+    val (websiteAddress, setWebsiteAddress) = useState<String?>(null)
     val (eventName, setEventName) = useState("")
     val (street, setStreet) = useState("")
     val (zipCode, setZipCode) = useState("")
     val (description, setDescription) = useState("")
     val (startTime, setStartTime) = useState("")
     val (endTime, setEndTime) = useState("")
-    val (imageInput, setImageInput) = useState<ArrayBuffer?>(null)
+    val (maybeImageInput, setImageInput) = useState<ArrayBuffer?>(null)
     val (coordinates, setCoordinates) = useState<LatLng?>(null)
 
-    val (addressError, setAddressError) = useState(false)
     val (timeout, setTimeout) = useState<Int?>(null)
 
     val (mapHolder, _) = useState(MapHolder(null))
@@ -132,84 +95,69 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
     }
 
     ReactHTML.form {
-        ReactHTML.table {
-            css(ClassNames.phoneFullWidth) {
-                width = 50.pct
-                float = Float.left
-                tableLayout = TableLayout.fixed
-            }
-            Input {
-                label = "Vorname"
-                setter = setFirstName
-            }
-            Input {
-                label = "Nachname"
-                setter = setLastName
-            }
-            Input {
-                label = "Email"
-                setter = setEmailAddress
-                type = InputType.email
-            }
-            Input {
-                label = "Organisation" // TODO clearer name: Organisation/Verein/Unternehmen/Privatperson -> needs different design
-                setter = setOrganization
-            }
-            Input {
-                label = "Webseite"
-                setter = setWebsiteAddress
-                optional = true
-                type = InputType.url
-            }
-            Input {
-                label = "Event Name"
-                setter = setEventName
-            }
+        TextFormField {
+            text = "Vorname"
+            value = firstName
+            stateSetter = setFirstName
         }
-        ReactHTML.table {
-            css(ClassNames.phoneFullWidth) {
-                width = 50.pct
-                float = Float.left
-                tableLayout = TableLayout.fixed
-            }
-            Input {
-                label = "Straße"
-                setter = setStreet
-                error = addressError
-            }
-            Input {
-                label = "PLZ"
-                setter = setZipCode
-                error = addressError
-            }
-            Input {
-                label = "Beginn"
-                setter = setStartTime
-                type = InputType.time
-            }
-            Input {
-                label = "Ende"
-                setter = setEndTime
-                type = InputType.time
-            }
+        TextFormField {
+            text = "Nachname"
+            stateSetter = setLastName
+        }
+        TextFormField {
+            text = "Email"
+            stateSetter = setEmailAddress
+            type = InputType.email
+        }
+        TextFormField {
+            text = "Name: Organisation/Verein/Unternehmen/Privatperson"
+            stateSetter = setOrganization
+        }
+        OptionalTextFormField {
+            text = "Webseite"
+            stateSetter = setWebsiteAddress
+            type = InputType.url
+        }
+        TextFormField {
+            text = "Event Name"
+            stateSetter = setEventName
+        }
+        TextFormField {
+            text = "Straße"
+            stateSetter = setStreet
+        }
+        TextFormField {
+            text = "PLZ"
+            stateSetter = setZipCode
+        }
+        TextFormField {
+            text = "Beginn"
+            stateSetter = setStartTime
+            type = InputType.time
+        }
+        TextFormField {
+            text = "Ende"
+            stateSetter = setEndTime
+            type = InputType.time
+        }
 
-            ReactHTML.tr {
-                ReactHTML.td {
-                    +"Bild:"
-                }
-                ReactHTML.td {
-                    ReactHTML.input {
-                        type = InputType.file
-                        required = true
-                        onChange = {
-                            val fileReader = FileReader()
+        ReactHTML.div {
+            css(formFieldStyle)
+            FormFieldLabel {
+                text = "Bild"
+                required = false
+            }
+            ReactHTML.input {
+                css(inputStyle)
+                type = InputType.file
+                required = false
+                onChange = {
+                    val fileReader = FileReader()
 
-                            fileReader.readAsArrayBuffer(it.target.files!![0])
+                    fileReader.readAsArrayBuffer(it.target.files!![0])
 
-                            fileReader.onload = { e ->
-                                setImageInput(e.target!!.result as ArrayBuffer)
-                            }
-                        }
+                    fileReader.onload = { e ->
+                        setImageInput(e.target!!.result as ArrayBuffer)
                     }
                 }
             }
@@ -245,33 +193,40 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
             it.preventDefault()
 
             coordinates?.let { c ->
-                @Suppress("CAST_NEVER_SUCCEEDS") // it evidently does succeed
-                val image = imageInput!!.run { Int8Array(this) as ByteArray }
+                val dto = CleanUpEventCreationDTO(
+                    cleanupDayId = cleanupDay.id,
+                    firstName = firstName,
+                    lastName = lastName,
+                    emailAddress = emailAddress,
+                    organization = organization,
+                    websiteAddress = websiteAddress,
+                    eventName = eventName,
+                    street = street,
+                    zipCode = zipCode,
+                    latitude = c.lat.toDouble(),
+                    longitude = c.lng.toDouble(),
+                    startTime = startTime,
+                    endTime = endTime,
+                    description = description
+                )
 
-                val website = if(websiteAddress.isBlank()) null else websiteAddress
+                maybeImageInput?.let { imageInput ->
+                    @Suppress("CAST_NEVER_SUCCEEDS") // it evidently does succeed
+                    val image = imageInput.run { Int8Array(this) as ByteArray }
 
-                Requests.postImage(
-                    "/data/cleanupEvent",
-                    image,
-                    CleanUpEventCreationDTO(
-                        cleanupDayId = cleanupDay.id,
-                        firstName = firstName,
-                        lastName = lastName,
-                        emailAddress = emailAddress,
-                        organization = organization,
-                        websiteAddress = website,
-                        eventName = eventName,
-                        street = street,
-                        zipCode = zipCode,
-                        latitude = c.lat.toDouble(),
-                        longitude = c.lng.toDouble(),
-                        startTime = startTime,
-                        endTime = endTime,
-                        description = description
-                    )
-                ) {
-                    alert("Event wurde zur Bestätigung übermittelt!")
-                    location.reload()
+                    Requests.postImage(
+                        "/data/cleanupEventWithPicture",
+                        image,
+                        dto
+                    ) {
+                        alert("Event wurde zur Bestätigung übermittelt!")
+                        location.reload()
+                    }
+                } ?: run {
+                    Requests.post("/data/cleanupEvent", dto) {
+                        alert("Event wurde zur Bestätigung übermittelt!")
+                        location.reload()
+                    }
                 }
             } ?: run {
                 alert("Click auf die Karte um einen Ort festzulegen!")
@@ -285,11 +240,9 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
         }
 
         setTimeout(window.setTimeout({
-            setAddressError(false)
             setCoordinates(null)
             RequestHelper.getWithTimeout(
                 "/data/coordinates/$zipCode/$street",
-                setAddressError,
                 setTimeout
             ) { location ->
                 val latitude = location.latitude.toDouble()
@@ -321,7 +274,6 @@ private val RegisterForm = FC<RegisterFormProps> { props ->
                 markerHolder.marker = MapUtils.marker(coordinates)
 
                 markerHolder.marker!!.addTo(map)
-                setAddressError(false)
             } else {
                 markerHolder.marker?.let {
                     it.removeFrom(map)

@@ -13,6 +13,7 @@ val Routing = FC<Props> {
     val pages = listOf(
         AdminPage,
         ImpressumPage,
+        DataProtectionPolicyPage,
         RegisterCleanupEvent,
         ShareResultsPage,
         FindCleanup

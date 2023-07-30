@@ -3,13 +3,9 @@ package pages
 import components.RoutePage
 import css.Classes
 import emotion.react.css
-import kotlinx.browser.window
-import kotlinx.coroutines.withTimeout
 import react.FC
 import react.Props
 import react.dom.html.ReactHTML
-import react.useEffectOnce
-import utils.Requests
 import web.cssom.ObjectFit
 import web.cssom.px
 import web.location.location
@@ -25,29 +21,35 @@ object ImpressumPage : RoutePage {
                     +"Impressum"
                 }
 
-                ReactHTML.div {
-                    css(Classes.centered)
-                    ReactHTML.img {
-                        css {
-                            maxWidth = 300.px
-                            objectFit = ObjectFit.contain
-                        }
-                        src = "/static/logo-oval.png"
-                        onClick = {
-                            location.assign("/")
-                        }
+                val lines = listOf(
+                    "Green Heroes Austria",
+                    "Lerchenfelder Straße 44",
+                    "A-1080 Wien",
+                    "Email: office@greenheroes.at",
+                    "Web: www.greenheroes.at"
+                )
+
+                lines.forEach {
+                    ReactHTML.p {
+                        +it
                     }
                 }
 
-                useEffectOnce {
-                    Requests.get("/data/coordinates/1100/Leibnizgasse") { response ->
-
-                    }
-                    window.setTimeout({
-                        Requests.get("/data/address/52.5487429714954/-1.81602098644987") { response ->
-
+                ReactHTML.div {
+                    css(Classes.centered)
+                    ReactHTML.a {
+                        href = "https://greenheroes.at/impressum/"
+                        ReactHTML.img {
+                            css {
+                                maxWidth = 300.px
+                                objectFit = ObjectFit.contain
+                            }
+                            src = "/static/logo-oval.png"
+                            onClick = {
+                                location.assign("/")
+                            }
                         }
-                    }, 1000)
+                    }
                 }
             }
         }

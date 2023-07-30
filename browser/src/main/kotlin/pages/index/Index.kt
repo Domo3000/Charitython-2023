@@ -27,6 +27,14 @@ external interface CleanupDayProps : Props {
     var cleanupDay: CleanupDayDTO
 }
 
+external interface IndexProps : Props {
+    var cleanupDay: CleanupDayDTO?
+    var results: CleanupDayResultsDTO?
+    var background: BackgroundDTO?
+    var events: List<CleanUpEventDTO>
+    var stateSetter: (String, OverviewPage) -> Unit
+}
+
 object IndexPage : OverviewPage {
     override val component: FC<OverviewProps>
         get() = FC { props ->
@@ -34,72 +42,20 @@ object IndexPage : OverviewPage {
             val (background, setBackground) = useState<BackgroundDTO?>(null)
             val (events, setEvents) = useState<List<CleanUpEventDTO>>(emptyList())
 
-            ReactHTML.div {
-                css {
-                    display = Display.flex
-                    flexDirection = FlexDirection.column
-                    justifyContent = JustifyContent.spaceEvenly
-                    backgroundImage = url(background?.fileName?.let { "/files/$it" } ?: "/static/background.jpg")
-                    backgroundRepeat = BackgroundRepeat.noRepeat
-                    backgroundSize = BackgroundSize.cover
-                    backgroundAttachment = BackgroundAttachment.fixed
-                    height = 100.vh
-                }
-
-                props.cleanupDay?.let { cleanupDay ->
-                    CleanupDaySetHeader {
-                        this.cleanupDay = cleanupDay
-                    }
-                } ?: run {
-                    CleanupDayNotSetHeader { }
-                }
+            DesktopIndex {
+                cleanupDay = props.cleanupDay
+                stateSetter = props.stateSetter
+                this.results = results
+                this.background = background
+                this.events = events
             }
 
-            props.cleanupDay?.let { cleanupDay ->
-                CleanupDaySetBody {
-                    this.cleanupDay = cleanupDay
-                }
-            }
-
-            ReactHTML.div {
-                css {
-                    margin = Auto.auto
-                    maxWidth = 1000.px
-                    if (events.isEmpty()) {
-                        display = None.none
-                    } else {
-                        paddingTop = 10.px
-                        minHeight = 600.px
-                    }
-                }
-                MapUtils.MapHolder { }
-            }
-
-            results?.let { previousCleanupResults ->
-                CleanupDayResults {
-                    this.results = previousCleanupResults
-                }
-            }
-
-            useEffect(events) {
-                if(events.isNotEmpty()) {
-                    hydrateRoot(document.getElementById("map-holder")!!, reactWrapper<FC<Props>> {
-                        val map = MapUtils.map()
-
-                        events.forEach { event ->
-                            val marker = MapUtils.marker(
-                                coordinates = LatLng(event.latitude, event.longitude),
-                                title = event.eventName
-                            )
-
-                            marker.on(
-                                "click",
-                                { props.stateSetter("/details/${event.id}", DetailsPage(event.id)) })
-
-                            marker.addTo(map)
-                        }
-                    }.create())
-                }
+            MobileIndex {
+                cleanupDay = props.cleanupDay
+                stateSetter = props.stateSetter
+                this.results = results
+                this.background = background
+                this.events = events
             }
 
             useEffectOnce {

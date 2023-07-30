@@ -21,12 +21,8 @@ import routing.installRouting
 import utils.Connection
 import utils.logError
 import utils.logInfo
-import java.io.File
-import java.security.KeyStore
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
-
-private fun getSystemCharArray(key: String) = System.getenv(key).toCharArray()
 
 private fun generatePassword(length: Int = 10): String {
     val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
@@ -109,16 +105,10 @@ private fun Application.body(debug: Boolean) {
 }
 
 suspend fun main(): Unit = coroutineScope {
-    val keystoreFile = File("${System.getProperty("user.dir")}/documents/keystore.jks")
     val debug = try {
         System.getenv("DEBUG") == "true"
     } catch (_: Exception) {
         false
-    }
-    val alias = try {
-        System.getenv("KEY_ALIAS")
-    } catch (_: Exception) {
-        "worldcleanupday.at"
     }
 
     val environment = if (debug) {
@@ -137,13 +127,8 @@ suspend fun main(): Unit = coroutineScope {
             connector {
                 port = 8080
             }
-            sslConnector(
-                keyStore = KeyStore.getInstance(keystoreFile, getSystemCharArray("KEYSTORE_PASSWORD")),
-                keyAlias = alias,
-                keyStorePassword = { getSystemCharArray("KEYSTORE_PASSWORD") },
-                privateKeyPassword = { getSystemCharArray("KEYSTORE_PASSWORD") }) {
-                port = 8443
-                keyStorePath = keystoreFile
+            connector {
+                port = 8081
             }
             module {
                 body(debug)

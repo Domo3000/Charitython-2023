@@ -57,6 +57,12 @@ fun Route.publicRoute() = route("/data") {
         call.respondMessage(CleanUpEvents(events))
     }
     post("/cleanupEvent") {
+        val dto = call.receive<CleanUpEventCreationDTO>()
+        val new = CleanupEventDao.insert(dto, null)
+
+        call.respondMessage(IdMessage(new.id.value))
+    }
+    post("/cleanupEventWithPicture") {
         var dto: CleanUpEventCreationDTO? = null
         var fileName: String? = null
 
@@ -74,13 +80,9 @@ fun Route.publicRoute() = route("/data") {
             }
         }
 
-        if (fileName == null) {
-            call.respond(HttpStatusCode.BadRequest, "file was not a supported image")
-        } else {
-            val new = CleanupEventDao.insert(dto!!, fileName!!)
+        val new = CleanupEventDao.insert(dto!!, fileName)
 
-            call.respondMessage(IdMessage(new.id.value))
-        }
+        call.respondMessage(IdMessage(new.id.value))
     }
     post("/cleanupEventResult") {
         val result = call.receive<CleanupEventResultDTO>()

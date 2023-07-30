@@ -1,17 +1,24 @@
 package pages.index
 
+import components.OverviewPage
 import emotion.react.css
 import kotlinx.datetime.toJSDate
 import react.FC
 import react.dom.html.ReactHTML
 import css.Style
+import model.CleanupDayDTO
+import pages.FindCleanup
+import pages.RegisterCleanupEvent
+import react.Props
 import utils.getMonthString
-import web.cssom.Color
-import web.cssom.Display
-import web.cssom.FlexDirection
-import web.cssom.em
+import web.cssom.*
 
-val CleanupDaySetHeader = FC<CleanupDayProps> { props ->
+external interface CleanupDaySetHeaderProps : Props {
+    var cleanupDay: CleanupDayDTO
+    var stateSetter: (String, OverviewPage) -> Unit
+}
+
+val CleanupDaySetHeader = FC<CleanupDaySetHeaderProps> { props ->
     val date = props.cleanupDay.timestamp.toJSDate()
 
     ReactHTML.h1 {
@@ -41,11 +48,23 @@ val CleanupDaySetHeader = FC<CleanupDayProps> { props ->
         components.HeaderButton {
             text = "Cleanup anmelden"
             color = Style.yellowColor
+            link = "/${RegisterCleanupEvent.route}"
+            disabled = false
+            width = 110.0.px
+            onClick = {
+                props.stateSetter("/${RegisterCleanupEvent.route}", RegisterCleanupEvent)
+            }
         }
 
         components.HeaderButton {
             text = "Cleanup finden"
             color = Style.pinkColor
+            link = "/${FindCleanup.route}"
+            disabled = false
+            width = 110.0.px
+            onClick = {
+                props.stateSetter("/${FindCleanup.route}", FindCleanup)
+            }
         }
     }
 }
