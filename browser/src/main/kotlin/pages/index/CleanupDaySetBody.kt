@@ -17,7 +17,6 @@ val CleanupDaySetBody = FC<CleanupDayProps> { props ->
 
     ReactHTML.div {
         css {
-            height = 100.vh
             backgroundColor = Style.backgroundColor()
             display = Display.flex
             flexDirection = FlexDirection.column
@@ -45,63 +44,8 @@ val CleanupDaySetBody = FC<CleanupDayProps> { props ->
             +"Wir setzen weltweit ein Zeichen für den Umweltschutz!"
         }
 
-        ReactHTML.div {
-            val difference = date.toKotlinInstant().minus(Clock.System.now())
-            val daysDifference = difference.inWholeDays
-            val hoursDifference = difference.minus(daysDifference.days).inWholeHours
-            val minuteDifference = difference.minus(daysDifference.days).minus(hoursDifference.hours).inWholeMinutes
-
-            css {
-                display = Display.flex
-                flexDirection = FlexDirection.row
-                gap = 4.em
-                justifyContent = JustifyContent.center
-            }
-
-            ReactHTML.div {
-                css {
-                    backgroundColor = Style.yellowColor
-                    fontSize = IndexCommons.fontSize
-                    padding = IndexCommons.padding
-                }
-
-                ReactHTML.p {
-                    css {
-                        color = IndexCommons.textColor
-                    }
-                    +"$daysDifference Tage"
-                }
-            }
-
-            ReactHTML.div {
-                css {
-                    backgroundColor = Style.pinkColor
-                    fontSize = IndexCommons.fontSize
-                    padding = IndexCommons.padding
-                }
-
-                ReactHTML.p {
-                    css {
-                        color = IndexCommons.textColor
-                    }
-                    +"$hoursDifference Stunden" // TODO store date with 6 in the morning or something
-                }
-            }
-
-            ReactHTML.div {
-                css {
-                    backgroundColor = Style.blueColor
-                    fontSize = IndexCommons.fontSize
-                    padding = IndexCommons.padding
-                }
-
-                ReactHTML.p {
-                    css {
-                        color = IndexCommons.textColor
-                    }
-                    +"$minuteDifference Minuten"
-                }
-            }
+        CleanupDayTimer {
+            cleanupDay = props.cleanupDay
         }
 
         ReactHTML.div {

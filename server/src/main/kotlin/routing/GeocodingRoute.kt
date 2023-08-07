@@ -15,10 +15,10 @@ import kotlinx.serialization.json.Json
 import model.Location
 
 private fun url(query: String) =
-    "https://nominatim.openstreetmap.org/${query}format=json&limit=1&addressdetails=1"
+    "https://nominatim.openstreetmap.org/${query}&format=json&limit=1&addressdetails=1"
 
-private fun coordinatesUrl(street: String, zipCode: String) = url("search/$street,%20$zipCode?")
-private fun addressUrl(latitude: String, longitude: String) = url("reverse?lat=$latitude&lon=$longitude&")
+private fun coordinatesUrl(street: String, zipCode: String) = url("search?q=$street,%20$zipCode")
+private fun addressUrl(latitude: String, longitude: String) = url("reverse?lat=$latitude&lon=$longitude")
 
 @Serializable
 private data class Address(
