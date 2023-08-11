@@ -28,8 +28,8 @@ val CleanupDayHeader = FC<CleanupDayHeaderProps> { props ->
                 top = 20.pct
                 fontSize = 2.em
             }, mobile = {
-                top = 10.pct
-                fontSize = 1.5.em
+                top = 15.pct
+                fontSize = 1.em
             })()
             color = Style.pinkColor
         }
@@ -51,7 +51,7 @@ val CleanupDayHeader = FC<CleanupDayHeaderProps> { props ->
                 fontSize = 2.5.em
             }, mobile = {
                 top = 20.pct
-                fontSize = 2.em
+                fontSize = 1.4.em
             })()
             color = Style.pinkColor
         }

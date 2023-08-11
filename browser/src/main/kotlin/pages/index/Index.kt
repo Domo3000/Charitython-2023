@@ -1,5 +1,6 @@
 package pages.index
 
+import css.responsive
 import emotion.react.css
 import io.kvision.maps.externals.leaflet.geo.LatLng
 import io.kvision.react.reactWrapper
@@ -16,6 +17,14 @@ val Index = FC<IndexProps> { props ->
     val (mapInitialized, setMapInitialized) = useState(false)
 
     ReactHTML.div {
+        css {
+            responsive(desktop = {
+                marginTop = 150.px
+            }, mobile = {
+                marginTop = 90.px
+            })()
+        }
+
         ReactHTML.div {
             ReactHTML.img {
                 src = getFileName(props.background?.fileName, "background.jpg")
