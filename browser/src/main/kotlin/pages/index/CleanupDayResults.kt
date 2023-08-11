@@ -1,5 +1,6 @@
 package pages.index
 
+import css.responsive
 import emotion.react.css
 import kotlinx.datetime.toJSDate
 import model.CleanupDayResultsDTO
@@ -22,21 +23,37 @@ private val Info = FC<InfoProps> { props ->
         }
         ReactHTML.div {
             css {
-                height = 132.px
-                width = 132.px
+                responsive(desktop = {
+                    height = 132.px
+                    width = 132.px
+                }, mobile = {
+                    height = 66.px
+                    width = 66.px
+                })()
                 borderRadius = 50.pct
                 margin = Auto.auto
                 background = Color(Style.greyColor)
             }
             ReactHTML.div {
                 css {
-                    height = 132.px
+                    responsive(desktop = {
+                        height = 132.px
+                        width = 132.px
+                    }, mobile = {
+                        height = 66.px
+                        width = 66.px
+                    })()
                     textAlign = TextAlign.center
                 }
                 ReactHTML.i {
                     css(ClassName("fa-solid fa-${props.icon}")) {
-                        paddingTop = 35.px
-                        fontSize = 66.px
+                        responsive(desktop = {
+                            paddingTop = 35.px
+                            fontSize = 66.px
+                        }, mobile = {
+                            paddingTop = 17.5.px
+                            fontSize = 33.px
+                        })()
                         color = Color(Style.whiteColor)
                     }
                 }

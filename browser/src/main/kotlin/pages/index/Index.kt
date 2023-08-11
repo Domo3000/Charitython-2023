@@ -45,7 +45,7 @@ val Index = FC<IndexProps> { props ->
                     display = None.none
                 } else {
                     paddingTop = 10.px
-                    minHeight = 600.px
+                    paddingBottom = 10.px
                 }
             }
             MapUtils.MapHolder {}
