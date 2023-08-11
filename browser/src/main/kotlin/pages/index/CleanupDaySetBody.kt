@@ -44,31 +44,24 @@ val CleanupDaySetBody = FC<CleanupDayProps> { props ->
             cleanupDay = props.cleanupDay
         }
 
-        ReactHTML.div {
+        ReactHTML.p {
             css {
-                marginLeft = Auto.auto
-                marginRight = Auto.auto
                 fontSize = 2.5.em
-                padding = Padding(0.em, 2.em)
+                textAlign = TextAlign.center
+                color = IndexCommons.textColor
             }
 
-            ReactHTML.p {
-                css {
-                    textAlign = TextAlign.center
-                    color = IndexCommons.textColor
-                }
+            +"Am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} findet der World Cleanup Day statt. Weltweit werden an diesem Tag Straßen, Flüsse, Wälder und Strände von Müll befreit. Wir koordinieren dieses Event österreichweit."
+        }
 
-                +"Am ${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()} findet der World Cleanup Day statt. Weltweit werden an diesem Tag Straßen, Flüsse, Wälder und Strände von Müll befreit. Wir koordinieren dieses Event österreichweit."
+        ReactHTML.p {
+            css {
+                fontSize = 2.5.em
+                textAlign = TextAlign.center
+                color = IndexCommons.textColor
             }
 
-            ReactHTML.p {
-                css {
-                    textAlign = TextAlign.center
-                    color = IndexCommons.textColor
-                }
-
-                +"Mit unserem Engagement wollen wir weltweit ein Zeichen im Sinne des Umweltschutzes setzen und gleichzeitig in der Bevölkerung das Bewusstsein für Abfallvermeidung steigern."
-            }
+            +"Mit unserem Engagement wollen wir weltweit ein Zeichen im Sinne des Umweltschutzes setzen und gleichzeitig in der Bevölkerung das Bewusstsein für Abfallvermeidung steigern."
         }
     }
 }
