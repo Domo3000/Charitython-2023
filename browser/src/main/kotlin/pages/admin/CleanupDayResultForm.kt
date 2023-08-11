@@ -1,7 +1,6 @@
 package pages.admin
 
 import components.IntFormField
-import emotion.react.css
 import kotlinx.datetime.toJSDate
 import model.CleanupDayResultsDTO
 import react.FC
@@ -10,7 +9,6 @@ import react.dom.html.ReactHTML
 import react.useEffectOnce
 import react.useState
 import utils.Requests
-import web.cssom.px
 import web.html.ButtonType
 import web.prompts.alert
 
@@ -18,7 +16,7 @@ external interface CleanupDayResultProps : Props {
     var admin: Requests.AdminRequests
 }
 
-val CleanupDayResultForm = FC<GDPRFormProps> { props ->
+val CleanupDayResultForm = FC<CleanupDayResultProps> { props ->
     val (results, setResults) = useState<CleanupDayResultsDTO?>(null)
     val (numberOfParticipants, setNumberOfParticipants) = useState(0)
     val (totalWeight, setTotalWeight) = useState(0)
@@ -65,7 +63,7 @@ val CleanupDayResultForm = FC<GDPRFormProps> { props ->
                 props.admin.post(
                     "/data/previousCleanupDayResults",
                     CleanupDayResultsDTO(
-                        1,
+                        1, // unused
                         result.cleanupDayId,
                         result.timestamp,
                         totalWeight.toDouble(),
