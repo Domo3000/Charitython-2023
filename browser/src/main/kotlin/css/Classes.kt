@@ -5,6 +5,15 @@ import web.cssom.*
 
 private typealias CSS = PropertiesBuilder.() -> Unit
 
+fun responsive(desktop: CSS, mobile: CSS): CSS = {
+    media("only screen and (min-width: 800px)") {
+        desktop()
+    }
+    media("only screen and (max-width: 800px)") {
+        mobile()
+    }
+}
+
 object Classes {
     val centered: CSS = {
         margin = Auto.auto
@@ -14,12 +23,11 @@ object Classes {
     val limitedWidth: CSS = {
         margin = Auto.auto
         maxWidth = 1000.px
-        media("only screen and (min-width: 800px)") {
+        responsive(desktop = {
             marginTop = 150.px
-        }
-        media("only screen and (max-width: 800px)") {
+        }, mobile = {
             marginTop = 90.px
-        }
+        })()
     }
 
     val hidden: CSS = {

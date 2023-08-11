@@ -1,5 +1,6 @@
 package utils
 
+import css.responsive
 import emotion.react.css
 import io.kvision.maps.LeafletObjectFactory
 import io.kvision.maps.externals.leaflet.geo.LatLng
@@ -22,12 +23,11 @@ object MapUtils {
         ReactHTML.div {
             css {
                 clear = Clear.left
-                media("only screen and (min-width: 800px)") {
+                responsive(desktop = {
                     aspectRatio = AspectRatio(16.0 / 9.0)
-                }
-                media("only screen and (max-width: 800px)") {
+                }, mobile = {
                     aspectRatio = AspectRatio(1.0)
-                }
+                })()
             }
             this.id = props.id ?: "map-holder"
         }

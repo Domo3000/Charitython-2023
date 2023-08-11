@@ -2,15 +2,11 @@ package pages.index
 
 import css.Style
 import emotion.react.css
-import kotlinx.datetime.Clock
 import kotlinx.datetime.toJSDate
-import kotlinx.datetime.toKotlinInstant
 import react.FC
 import react.dom.html.ReactHTML
 import utils.getMonthString
 import web.cssom.*
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.hours
 
 val CleanupDaySetBody = FC<CleanupDayProps> { props ->
     val date = props.cleanupDay.timestamp.toJSDate()

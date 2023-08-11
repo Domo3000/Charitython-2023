@@ -7,6 +7,7 @@ import kotlinx.datetime.toJSDate
 import react.FC
 import react.dom.html.ReactHTML
 import css.Style
+import css.responsive
 import model.CleanupDayDTO
 import pages.FindCleanup
 import pages.RegisterCleanupEvent
@@ -23,14 +24,13 @@ val CleanupDayHeader = FC<CleanupDayHeaderProps> { props ->
     ReactHTML.h1 {
         css {
             position = Position.absolute
-            media("only screen and (min-width: 800px)") {
+            responsive(desktop = {
                 top = 20.pct
                 fontSize = 2.em
-            }
-            media("only screen and (max-width: 800px)") {
+            }, mobile = {
                 top = 10.pct
                 fontSize = 1.5.em
-            }
+            })()
             color = Style.pinkColor
         }
 
@@ -46,14 +46,13 @@ val CleanupDayHeader = FC<CleanupDayHeaderProps> { props ->
     ReactHTML.h2 {
         css {
             position = Position.absolute
-            media("only screen and (min-width: 800px)") {
+            responsive(desktop = {
                 top = 40.pct
                 fontSize = 2.5.em
-            }
-            media("only screen and (max-width: 800px)") {
+            }, mobile = {
                 top = 20.pct
                 fontSize = 2.em
-            }
+            })()
             color = Style.pinkColor
         }
 
