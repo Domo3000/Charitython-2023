@@ -68,7 +68,7 @@ private val CleanupDetails = FC<EventProps> { props ->
             }
         }
 
-        ReactHTML.a {
+        ReactHTML.h4 {
             css {
                 color = Style.pinkColor
             }

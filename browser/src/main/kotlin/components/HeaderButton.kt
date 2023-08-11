@@ -4,6 +4,7 @@ import css.Style
 import emotion.react.css
 import react.FC
 import react.Props
+import react.dom.events.MouseEvent
 import react.dom.events.MouseEventHandler
 import react.dom.html.ReactHTML
 import web.cssom.*
@@ -49,6 +50,8 @@ val HeaderButton = FC<HeaderButtonProps> { props ->
             }
         }
         disabled = props.disabled
-        //onClick = props.onClick
+        onClick = {
+            props.onClick(it as MouseEvent<HTMLAnchorElement, *>)
+        }
     }
 }
