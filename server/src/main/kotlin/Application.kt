@@ -1,9 +1,11 @@
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.ratelimit.*
 import io.ktor.server.plugins.statuspages.*
@@ -112,6 +114,16 @@ private fun Application.body(debug: Boolean) {
         install(RateLimit) {
             register {
                 rateLimiter(1, 1.seconds)
+            }
+        }
+
+        install(CachingHeaders) {
+            options { _, outgoingContent ->
+                when (outgoingContent.contentType?.withoutParameters()) {
+                    ContentType.Text.CSS, ContentType.Text.Html, ContentType.Image.JPEG, ContentType.Image.PNG ->
+                        CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60 * 60))
+                    else -> null
+                }
             }
         }
 

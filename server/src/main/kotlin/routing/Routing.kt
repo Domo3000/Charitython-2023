@@ -4,6 +4,7 @@ import data.CSS
 import data.index
 import data.styles
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.html.*
 import io.ktor.server.http.content.*
@@ -52,7 +53,9 @@ fun Application.installRouting() = routing {
         val baseDirectory = "${System.getProperty("user.dir")}/files"
 
         try {
-            call.respondFile(File("$baseDirectory/$fileName"))
+            call.respondFile(File("$baseDirectory/$fileName")) {
+                caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 365 * 24 * 60 * 60))
+            }
         } catch (e: IOException) {
             call.respond(HttpStatusCode.NotFound)
         }
