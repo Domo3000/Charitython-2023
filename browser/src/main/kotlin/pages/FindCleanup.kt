@@ -9,15 +9,14 @@ import css.Style
 import emotion.react.css
 import io.kvision.maps.externals.leaflet.geo.LatLng
 import io.kvision.react.reactWrapper
+import kotlinx.datetime.toJSDate
 import model.CleanUpEventDTO
 import model.CleanUpEvents
+import model.CleanupDayDTO
 import react.*
 import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
-import utils.Defaults
-import utils.MapUtils
-import utils.Requests
-import utils.getFileName
+import utils.*
 import web.cssom.*
 import web.dom.document
 
@@ -77,10 +76,21 @@ private val CleanupDetails = FC<EventProps> { props ->
     }
 }
 
+private fun getEvents(id: Int, stateSetter: StateSetter<List<CleanUpEventDTO>>) =
+    Requests.getMessage("/data/cleanupEvents/$id") { message ->
+        stateSetter((message as CleanUpEvents).events.filter { it.approved })
+    }
+
+private fun getDate(cleanupDay: CleanupDayDTO): String {
+    val date = cleanupDay.timestamp.toJSDate()
+    return "${date.getDate()}. ${date.getMonthString()} ${date.getFullYear()}"
+}
+
 object FindCleanup : RoutePage {
     override val route: String = "cleanupFinden" // TODO use everywhere same style for routes
     override val component: FC<OverviewProps>
         get() = FC { props ->
+            val (previous, setPrevious) = useState<CleanupDayDTO?>(null)
             val (events, setEvents) = useState<List<CleanUpEventDTO>>(emptyList())
 
             ReactHTML.div {
@@ -91,6 +101,20 @@ object FindCleanup : RoutePage {
                 }
 
                 if (events.isNotEmpty()) {
+                    previous?.let {
+                        ReactHTML.p {
+                            +"Es wurden leider noch keine Cleanup Events für den nächsten Cleanup Day erstellt!"
+                        }
+                        ReactHTML.p {
+                            +"Cleanup Events für den vorherigen World Cleanup Day am ${getDate(it)}."
+                        }
+                    } ?: run {
+                        props.cleanupDay?.let { cleanupDay ->
+                            ReactHTML.p {
+                                +"Cleanup Events für den nächsten World Cleanup Day am ${getDate(cleanupDay)}."
+                            }
+                        }
+                    }
                     MapUtils.MapHolder { }
                 } else {
                     ReactHTML.p {
@@ -137,8 +161,13 @@ object FindCleanup : RoutePage {
 
             useEffectOnce {
                 props.cleanupDay?.let { cleanupDay ->
-                    Requests.getMessage("/data/cleanupEvents/${cleanupDay.id}") { message ->
-                        setEvents((message as CleanUpEvents).events.filter { it.approved })
+                    setPrevious(null)
+                    getEvents(cleanupDay.id, setEvents)
+                } ?: run {
+                    Requests.getMessage("/data/previousCleanupDay") { cleanupDayMessage ->
+                        val previousCleanupDay = cleanupDayMessage as CleanupDayDTO
+                        setPrevious(previousCleanupDay)
+                        getEvents(previousCleanupDay.id, setEvents)
                     }
                 }
             }

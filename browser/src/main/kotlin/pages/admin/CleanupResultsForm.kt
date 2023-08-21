@@ -1,21 +1,18 @@
 package pages.admin
 
 import csstype.PropertiesBuilder
-import react.Props
-import utils.Requests
 import emotion.react.css
-import js.buffer.ArrayBuffer
-import js.typedarrays.Int8Array
 import kotlinx.datetime.toJSDate
-import model.*
+import model.CleanupDayDTO
+import model.CleanupEventResultDTO
+import model.CleanupEventResultsDTO
 import react.FC
+import react.Props
 import react.dom.html.ReactHTML
 import react.useEffectOnce
 import react.useState
+import utils.Requests
 import web.cssom.*
-import web.file.FileReader
-import web.html.InputType
-
 
 external interface CleanupResultsFormProps : Props {
     var admin: Requests.AdminRequests

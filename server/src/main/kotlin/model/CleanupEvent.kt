@@ -50,19 +50,27 @@ class CleanupEventDao(id: EntityID<Int>) : IntEntity(id) {
                 approved = false
             }
         }
+
+        fun getAll(): List<CleanupEventDao> = transaction {
+            all().toList()
+        }
+
         fun getAllByCleanupDayId(cleanupDayId: Int): List<CleanupEventDao> = transaction {
             find {
                 CleanupEvent.cleanupDayId.eq(cleanupDayId)
             }.toList()
         }
+
         fun getById(id: Int): CleanupEventDao? = transaction {
             findById(id)
         }
+
         fun approve(id: Int) = transaction {
             CleanupEvent.update({ CleanupEvent.id.eq(id) }) {
                 it[approved] = true
             }
         }
+
         fun delete(id: Int) = transaction {
             CleanupEvent.deleteWhere { this.id.eq(id) }
         }

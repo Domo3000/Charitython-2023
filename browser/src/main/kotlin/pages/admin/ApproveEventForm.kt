@@ -118,7 +118,7 @@ private val CleanupDetails = FC<ApproveEventProps> { props ->
                 ReactHTML.span {
                     +"Event löschen"
                 }
-                // TODO
+                // TODO verification dialog
                 onClick = {
                     props.admin.delete("/data/deleteEvent/${cleanUpEvent.id}") {
                         alert("Deleted event ${cleanUpEvent.eventName}")

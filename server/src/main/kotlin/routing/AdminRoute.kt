@@ -8,7 +8,6 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.css.Clear
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -24,6 +23,11 @@ fun Route.adminRoute() = authenticate(BASIC_AUTH) {
             call.respond("Authenticated!")
         }
         route("/data") {
+            get("/cleanupEvents") {
+                val events = CleanupEventDao.getAll().map { it.toDTO() }
+                call.respondMessage(CleanUpEvents(events))
+            }
+
             post("/approveEvent/{id}") {
                 val eventId = call.parameters["id"]!!.toInt()
                 CleanupEventDao.approve(eventId)

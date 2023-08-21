@@ -10,6 +10,7 @@ import io.kvision.maps.externals.leaflet.geo.LatLng
 import io.kvision.react.reactWrapper
 import kotlinx.datetime.toJSDate
 import model.CleanUpEventDTO
+import model.CleanupDayDTO
 import react.*
 import react.dom.client.hydrateRoot
 import react.dom.html.ReactHTML
@@ -27,7 +28,7 @@ external interface IconTextProps : Props {
 
 val IconText = FC<IconTextProps> { props ->
     ReactHTML.div {
-        css { 
+        css {
             marginTop = 15.px
             marginBottom = 15.px
         }
@@ -245,24 +246,28 @@ class DetailsPage(private val maybeEventId: Int?) : OverviewPage {
         get() = FC { props ->
             val eventId = maybeEventId ?: useParams()["id"]!!
             val (loading, setLoading) = useState(true)
+            val (cleanUpDay, setCleanupDay) = useState<CleanupDayDTO?>(null)
             val (cleanUpEvent, setCleanupEvent) = useState<CleanUpEventDTO?>(null)
 
             ReactHTML.div {
                 css(Classes.limitedWidth)
-                cleanUpEvent?.let {
-                    val cleanupDayDate =
-                        props.cleanupDay!!.timestamp.toJSDate().toLocaleDateString("de-AT", dateLocaleOptions {
-                            day = "2-digit"
-                            month = "2-digit"
-                            year = "numeric"
-                        })
-                    DesktopCleanupDetails {
-                        this.cleanupDayDate = cleanupDayDate
-                        this.cleanUpEvent = it
-                    }
-                    MobileCleanupDetails {
-                        this.cleanupDayDate = cleanupDayDate
-                        this.cleanUpEvent = it
+                cleanUpEvent?.let { event ->
+                    cleanUpDay?.let { day ->
+                        val cleanupDayDate =
+                            day.timestamp.toJSDate().toLocaleDateString("de-AT", dateLocaleOptions {
+                                this.day = "2-digit"
+                                this.month = "2-digit"
+                                this.year = "numeric"
+                            })
+
+                        DesktopCleanupDetails {
+                            this.cleanupDayDate = cleanupDayDate
+                            this.cleanUpEvent = event
+                        }
+                        MobileCleanupDetails {
+                            this.cleanupDayDate = cleanupDayDate
+                            this.cleanUpEvent = event
+                        }
                     }
                 } ?: run {
                     if (loading) {
@@ -274,14 +279,15 @@ class DetailsPage(private val maybeEventId: Int?) : OverviewPage {
             }
 
             useEffectOnce {
-                props.cleanupDay?.let {
-                    Requests.getMessage("/data/cleanupEvent/$eventId") {
-                        setLoading(false)
-                        setCleanupEvent((it as CleanUpEventDTO))
+                Requests.getMessage("/data/cleanupEvent/$eventId") { eventMessage ->
+                    (eventMessage as? CleanUpEventDTO)?.let { event ->
+                        Requests.getMessage("/data/cleanupDay/${event.cleanupDayId}") { cleanupDayMessage ->
+                            setCleanupDay(cleanupDayMessage as CleanupDayDTO)
+                        }
+                        setCleanupEvent(event)
                     }
+                    setLoading(false)
                 }
-                // TODO get cleanupDay of this event
-                //  as one could want to look at one in the past so we need to display correct date or message that it's over already
             }
         }
 }

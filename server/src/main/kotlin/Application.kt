@@ -33,6 +33,12 @@ private fun generatePassword(length: Int = 10): String {
     }.joinToString("")
 }
 
+private fun readBooleanVariable(name: String) = try {
+    System.getenv(name) == "true"
+} catch (_: Exception) {
+    false
+}
+
 private fun Application.body(debug: Boolean) {
     with(environment) {
         val database = if (debug) {
@@ -44,14 +50,23 @@ private fun Application.body(debug: Boolean) {
             Connection(url, user, password)
         }
 
-        val password = if(debug) {
-            "admin"
-        } else {
-            generatePassword()
+        val password: String = AdminDao.getLatest()?.let {
+            if (readBooleanVariable("RESET_PASSWORD")) {
+                return@let null
+            } else {
+                logInfo("current password: ${it.password}")
+                return@let it.password
+            }
+        } ?: run {
+            val newPassword = if (debug) {
+                "admin"
+            } else {
+                generatePassword()
+            }
+            AdminDao.insert(newPassword)
+            logInfo("generated new password: $newPassword")
+            newPassword
         }
-
-        AdminDao.insert(password)
-        logInfo("generated new password: $password")
 
         CleanupDayDao.getLast() ?: run {
             logInfo("inserting default values")
@@ -105,11 +120,7 @@ private fun Application.body(debug: Boolean) {
 }
 
 suspend fun main(): Unit = coroutineScope {
-    val debug = try {
-        System.getenv("DEBUG") == "true"
-    } catch (_: Exception) {
-        false
-    }
+    val debug = readBooleanVariable("DEBUG")
 
     val environment = if (debug) {
         applicationEngineEnvironment {

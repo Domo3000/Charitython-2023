@@ -17,6 +17,15 @@ fun Route.publicRoute() = route("/data") {
             call.respond(HttpStatusCode.NotFound, "current one might already be in past. next one is not set")
         }
     }
+    get("/cleanupDay/{cleanupDayId}") {
+        val cleanupDayId = Integer.parseInt(call.parameters["cleanupDayId"])
+
+        CleanupDayDao.getById(cleanupDayId)?.let {
+            call.respondMessage(it.toDTO())
+        } ?: run {
+            call.respond(HttpStatusCode.NotFound, "current one might already be in past. next one is not set")
+        }
+    }
     get("/previousCleanupDay") {
         CleanupDayDao.getLast()?.let {
             call.respondMessage(it.toDTO())
