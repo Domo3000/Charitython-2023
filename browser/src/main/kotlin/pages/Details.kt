@@ -112,7 +112,7 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
                     text = cleanUpEvent.organization
                 }
 
-                cleanUpEvent.websiteAddress?.let { website ->
+                if (!cleanUpEvent.websiteAddress.isNullOrEmpty()) {
                     ReactHTML.div {
                         ReactHTML.i {
                             className = ClassName("fa-solid fa-link")
@@ -121,8 +121,8 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
                             css {
                                 paddingLeft = 15.px
                             }
-                            +website
-                            href = website
+                            +cleanUpEvent.websiteAddress
+                            href = cleanUpEvent.websiteAddress
                         }
                     }
                 }
@@ -206,7 +206,7 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
             text = "${cleanUpEvent.zipCode} ${cleanUpEvent.street}"
         }
 
-        cleanUpEvent.websiteAddress?.let { website ->
+        if (!cleanUpEvent.websiteAddress.isNullOrEmpty()) {
             ReactHTML.div {
                 css {
                     marginBottom = 2.rem
@@ -218,8 +218,8 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
                     css {
                         paddingLeft = 15.px
                     }
-                    +website
-                    href = website
+                    +cleanUpEvent.websiteAddress
+                    href = cleanUpEvent.websiteAddress
                 }
             }
         }
