@@ -45,6 +45,18 @@ val IconText = FC<IconTextProps> { props ->
     }
 }
 
+private external interface DescriptionProps : Props {
+    var description: String
+}
+
+private val Description = FC<DescriptionProps> { props ->
+    props.description.split("\n").forEach { line ->
+        ReactHTML.p {
+            +line
+        }
+    }
+}
+
 private external interface CleanUpEventProps : Props {
     var cleanupDayDate: String
     var cleanUpEvent: CleanUpEventDTO
@@ -129,8 +141,8 @@ private val DesktopCleanupDetails = FC<CleanUpEventProps> { props ->
             id = mapId
         }
 
-        ReactHTML.p {
-            +cleanUpEvent.description
+        Description {
+            description = cleanUpEvent.description
         }
 
         useEffectOnce {
@@ -216,8 +228,8 @@ private val MobileCleanupDetails = FC<CleanUpEventProps> { props ->
             id = mapId
         }
 
-        ReactHTML.p {
-            +cleanUpEvent.description
+        Description {
+            description = cleanUpEvent.description
         }
 
         useEffectOnce {
