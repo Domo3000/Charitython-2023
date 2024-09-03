@@ -16,7 +16,8 @@ val Routing = FC<Props> {
         DataProtectionPolicyPage,
         RegisterCleanupEvent,
         ShareResultsPage,
-        FindCleanup
+        FindCleanup,
+        Donations
     )
 
     BrowserRouter {

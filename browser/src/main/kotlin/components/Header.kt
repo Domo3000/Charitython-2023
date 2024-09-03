@@ -139,7 +139,7 @@ private val DesktopHeader = FC<MenuProps> { props ->
     }
 }
 
-private object ButtonColorPicker {
+private class ButtonColorPicker {
     val colors = listOf(Style.yellowColor, Style.pinkColor, Style.blueColor)
     var next = 0
 
@@ -153,11 +153,13 @@ external interface HeaderProps : Props {
 }
 
 val Header = FC<HeaderProps> { props ->
+    val colorPicker = ButtonColorPicker()
     val buttons: List<MenuButton> = listOf(
         RegisterCleanupEvent to "Cleanup anmelden",
         FindCleanup to "Cleanup finden",
-        ShareResultsPage to "Ergebnisse teilen"
-    ).map { (page, text) -> Triple(page, ButtonColorPicker.nextColor(), text) }
+        ShareResultsPage to "Ergebnisse teilen",
+        Donations to "Spenden"
+    ).map { (page, text) -> Triple(page, colorPicker.nextColor(), text) }
 
     val (scrollY, setScrollY) = useState(0.0)
     val (isMenuOpen, setMenuOpen) = useState(false)

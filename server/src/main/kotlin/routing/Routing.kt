@@ -1,6 +1,7 @@
 package routing
 
 import data.CSS
+import data.donations
 import data.index
 import data.styles
 import io.ktor.http.*
@@ -59,6 +60,9 @@ fun Application.installRouting() = routing {
         } catch (e: IOException) {
             call.respond(HttpStatusCode.NotFound)
         }
+    }
+    get("/donations") {
+        call.respondHtml(HttpStatusCode.OK, HTML::donations)
     }
     get("/{...}") {
         call.respondHtml(HttpStatusCode.OK, HTML::index)

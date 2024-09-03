@@ -22,6 +22,10 @@ fun CssBuilder.styles() {
         textAlign = TextAlign.left
     }
 
+    rule(".noBorder") {
+        border = "0 !important"
+    }
+
     body {
         backgroundColor = Color(Style.backgroundColor())
     }
